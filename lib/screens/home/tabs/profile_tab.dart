@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../services/auth_service.dart';
 import '../../../widgets/custom_text_field.dart';
 import '../../../widgets/custom_button.dart';
@@ -551,7 +552,10 @@ class _ProfileTabState extends State<ProfileTab> {
     if (date == null) return 'Unknown';
     
     try {
-      if (date is DateTime) {
+      if (date is Timestamp) {
+        final timestamp = date as Timestamp;
+        return '${timestamp.toDate().day}/${timestamp.toDate().month}/${timestamp.toDate().year}';
+      } else if (date is DateTime) {
         return '${date.day}/${date.month}/${date.year}';
       } else if (date is String) {
         final parsed = DateTime.parse(date);
