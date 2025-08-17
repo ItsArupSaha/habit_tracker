@@ -222,6 +222,33 @@ class _ProfileTabState extends State<ProfileTab> {
                           
                           const SizedBox(height: 16),
                           
+                          // Age
+                          _buildInfoRow(
+                            'Age',
+                            _getAgeFromProfile(profile),
+                            Icons.cake_outlined,
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          // Weight
+                          _buildInfoRow(
+                            'Weight',
+                            _getWeightFromProfile(profile),
+                            Icons.fitness_center_outlined,
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
+                          // Height
+                          _buildInfoRow(
+                            'Height',
+                            _getHeightFromProfile(profile),
+                            Icons.height_outlined,
+                          ),
+                          
+                          const SizedBox(height: 16),
+                          
                           // Other details
                           if (_isEditing)
                             CustomTextField(
@@ -409,5 +436,32 @@ class _ProfileTabState extends State<ProfileTab> {
     } catch (e) {
       return 'Unknown';
     }
+  }
+
+  String _getAgeFromProfile(Map<String, dynamic>? profile) {
+    if (profile == null) return 'Not specified';
+    final otherDetails = profile['otherDetails'] as Map<String, dynamic>?;
+    if (otherDetails == null) return 'Not specified';
+    final age = otherDetails['age'] as int?;
+    if (age == null) return 'Not specified';
+    return '$age years';
+  }
+
+  String _getWeightFromProfile(Map<String, dynamic>? profile) {
+    if (profile == null) return 'Not specified';
+    final otherDetails = profile['otherDetails'] as Map<String, dynamic>?;
+    if (otherDetails == null) return 'Not specified';
+    final weight = otherDetails['weight'] as double?;
+    if (weight == null) return 'Not specified';
+    return '${weight.toStringAsFixed(1)} kg';
+  }
+
+  String _getHeightFromProfile(Map<String, dynamic>? profile) {
+    if (profile == null) return 'Not specified';
+    final otherDetails = profile['otherDetails'] as Map<String, dynamic>?;
+    if (otherDetails == null) return 'Not specified';
+    final height = otherDetails['height'] as double?;
+    if (height == null) return 'Not specified';
+    return '${height.toStringAsFixed(1)} cm';
   }
 }

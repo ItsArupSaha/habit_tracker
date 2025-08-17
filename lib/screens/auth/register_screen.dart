@@ -18,6 +18,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _heightController = TextEditingController();
   
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -33,6 +36,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _ageController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
     super.dispose();
   }
   
@@ -57,6 +63,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
         gender: _selectedGender,
+        otherDetails: {
+          'age': _ageController.text.trim().isNotEmpty ? int.tryParse(_ageController.text.trim()) : null,
+          'weight': _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
+          'height': _heightController.text.trim().isNotEmpty ? double.tryParse(_heightController.text.trim()) : null,
+        },
       );
       
       if (result['success']) {
@@ -257,6 +268,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     setState(() {
                       _selectedGender = newValue;
                     });
+                  },
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Age field
+                CustomTextField(
+                  controller: _ageController,
+                  labelText: 'Age (Optional)',
+                  hintText: 'Enter your age (in years)',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icons.cake_outlined,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final int age = int.tryParse(value) ?? 0;
+                      if (age < 0 || age > 120) {
+                        return 'Age must be between 0 and 120';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Weight field
+                CustomTextField(
+                  controller: _weightController,
+                  labelText: 'Weight (Optional)',
+                  hintText: 'Enter your weight in kg',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icons.fitness_center_outlined,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final double weight = double.tryParse(value) ?? 0.0;
+                      if (weight < 0.0) {
+                        return 'Weight must be positive';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+                
+                const SizedBox(height: 20),
+                
+                // Height field
+                CustomTextField(
+                  controller: _heightController,
+                  labelText: 'Height (Optional)',
+                  hintText: 'Enter your height in cm',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icons.height_outlined,
+                  validator: (value) {
+                    if (value != null && value.isNotEmpty) {
+                      final double height = double.tryParse(value) ?? 0.0;
+                      if (height < 0.0) {
+                        return 'Height must be positive';
+                      }
+                    }
+                    return null;
                   },
                 ),
                 
