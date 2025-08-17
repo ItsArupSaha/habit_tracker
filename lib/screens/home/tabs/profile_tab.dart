@@ -15,6 +15,9 @@ class _ProfileTabState extends State<ProfileTab> {
   final _formKey = GlobalKey<FormState>();
   final _displayNameController = TextEditingController();
   final _otherDetailsController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _weightController = TextEditingController();
+  final _heightController = TextEditingController();
   
   bool _isEditing = false;
   bool _isLoading = false;
@@ -25,14 +28,29 @@ class _ProfileTabState extends State<ProfileTab> {
   @override
   void initState() {
     super.initState();
-    _loadProfileData();
+    // Listen to profile changes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authService = Provider.of<AuthService>(context, listen: false);
+      authService.addListener(_onProfileChanged);
+    });
   }
   
   @override
   void dispose() {
+    final authService = Provider.of<AuthService>(context, listen: false);
+    authService.removeListener(_onProfileChanged);
     _displayNameController.dispose();
     _otherDetailsController.dispose();
+    _ageController.dispose();
+    _weightController.dispose();
+    _heightController.dispose();
     super.dispose();
+  }
+  
+  void _onProfileChanged() {
+    if (mounted && !_isEditing) {
+      _loadProfileData();
+    }
   }
   
   void _loadProfileData() {
@@ -46,8 +64,25 @@ class _ProfileTabState extends State<ProfileTab> {
       final otherDetails = profile['otherDetails'] as Map<String, dynamic>?;
       if (otherDetails != null) {
         _otherDetailsController.text = otherDetails['notes'] ?? '';
+        _ageController.text = otherDetails['age']?.toString() ?? '';
+        _weightController.text = otherDetails['weight']?.toString() ?? '';
+        _heightController.text = otherDetails['height']?.toString() ?? '';
       }
     }
+  }
+  
+  void _startEditing() {
+    _loadProfileData();
+    setState(() {
+      _isEditing = true;
+    });
+  }
+  
+  void _cancelEditing() {
+    setState(() {
+      _isEditing = false;
+    });
+    _loadProfileData();
   }
   
   Future<void> _saveProfile() async {
@@ -59,6 +94,9 @@ class _ProfileTabState extends State<ProfileTab> {
       final authService = Provider.of<AuthService>(context, listen: false);
       final otherDetails = {
         'notes': _otherDetailsController.text.trim(),
+        'age': _ageController.text.trim().isNotEmpty ? int.tryParse(_ageController.text.trim()) : null,
+        'weight': _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
+        'height': _heightController.text.trim().isNotEmpty ? double.tryParse(_heightController.text.trim()) : null,
       };
       
       final result = await authService.updateProfile(
@@ -129,6 +167,13 @@ class _ProfileTabState extends State<ProfileTab> {
         if (profile == null) {
           return const Center(child: CircularProgressIndicator());
         }
+        
+        // Ensure controllers have current profile data
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_isEditing) {
+            _loadProfileData();
+          }
+        });
         
         return Scaffold(
           body: SingleChildScrollView(
@@ -223,39 +268,108 @@ class _ProfileTabState extends State<ProfileTab> {
                           const SizedBox(height: 16),
                           
                           // Age
-                          _buildInfoRow(
-                            'Age',
-                            _getAgeFromProfile(profile),
-                            Icons.cake_outlined,
-                          ),
+                          if (_isEditing)
+                            _buildEditableField(
+                              'Age',
+                              _ageController,
+                              Icons.cake_outlined,
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  final int age = int.tryParse(value) ?? 0;
+                                  if (age < 0 || age > 120) {
+                                    return 'Age must be between 0 and 120';
+                                  }
+                                }
+                                return null;
+                              },
+                            )
+                          else
+                            _buildInfoRow(
+                              'Age',
+                              _getAgeFromProfile(profile),
+                              Icons.cake_outlined,
+                            ),
                           
                           const SizedBox(height: 16),
                           
                           // Weight
-                          _buildInfoRow(
-                            'Weight',
-                            _getWeightFromProfile(profile),
-                            Icons.fitness_center_outlined,
-                          ),
+                          if (_isEditing)
+                            _buildEditableField(
+                              'Weight',
+                              _weightController,
+                              Icons.fitness_center_outlined,
+                              keyboardType: TextInputType.number,
+                              hintText: 'Enter weight in kg',
+                              validator: (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  final double weight = double.tryParse(value) ?? 0.0;
+                                  if (weight < 0.0) {
+                                    return 'Weight must be positive';
+                                  }
+                                }
+                                return null;
+                              },
+                            )
+                          else
+                            _buildInfoRow(
+                              'Weight',
+                              _getWeightFromProfile(profile),
+                              Icons.fitness_center_outlined,
+                            ),
                           
                           const SizedBox(height: 16),
                           
                           // Height
-                          _buildInfoRow(
-                            'Height',
-                            _getHeightFromProfile(profile),
-                            Icons.height_outlined,
-                          ),
+                          if (_isEditing)
+                            _buildEditableField(
+                              'Height',
+                              _heightController,
+                              Icons.height_outlined,
+                              keyboardType: TextInputType.number,
+                              hintText: 'Enter height in cm',
+                              validator: (value) {
+                                if (value != null && value.isNotEmpty) {
+                                  final double height = double.tryParse(value) ?? 0.0;
+                                  if (height < 0.0) {
+                                    return 'Height must be positive';
+                                  }
+                                }
+                                return null;
+                              },
+                            )
+                          else
+                            _buildInfoRow(
+                              'Height',
+                              _getHeightFromProfile(profile),
+                              Icons.height_outlined,
+                            ),
                           
                           const SizedBox(height: 16),
                           
                           // Other details
                           if (_isEditing)
-                            CustomTextField(
-                              controller: _otherDetailsController,
-                              labelText: 'Notes',
-                              hintText: 'Add any additional details...',
-                              maxLines: 3,
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Notes',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                CustomTextField(
+                                  controller: _otherDetailsController,
+                                  labelText: 'Notes',
+                                  hintText: 'Add any additional details...',
+                                  maxLines: 3,
+                                  validator: (value) {
+                                    // Notes are optional, so no validation needed
+                                    return null;
+                                  },
+                                ),
+                              ],
                             )
                           else
                             _buildInfoRow(
@@ -287,8 +401,7 @@ class _ProfileTabState extends State<ProfileTab> {
                         Expanded(
                           child: TextButton(
                             onPressed: _isLoading ? null : () {
-                              setState(() => _isEditing = false);
-                              _loadProfileData(); // Reset to original values
+                              _cancelEditing();
                             },
                             child: const Text('Cancel'),
                           ),
@@ -310,7 +423,7 @@ class _ProfileTabState extends State<ProfileTab> {
                     ),
                   ] else ...[
                     CustomButton(
-                      onPressed: () => setState(() => _isEditing = true),
+                      onPressed: () => _startEditing(),
                       child: const Text('Edit Profile'),
                     ),
                   ],
@@ -374,49 +487,61 @@ class _ProfileTabState extends State<ProfileTab> {
     );
   }
   
-  Widget _buildGenderDropdown() {
-    return Row(
+  Widget _buildEditableField(String label, TextEditingController controller, IconData icon, {TextInputType keyboardType = TextInputType.text, String hintText = '', String? Function(String?)? validator}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          Icons.person_outline,
-          size: 20,
-          color: Colors.grey[600],
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Gender',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              DropdownButtonFormField<String>(
-                value: _selectedGender,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  filled: true,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                ),
-                items: _genderOptions.map((gender) {
-                  return DropdownMenuItem<String>(
-                    value: gender,
-                    child: Text(gender),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedGender = newValue;
-                  });
-                },
-              ),
-            ],
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
           ),
+        ),
+        const SizedBox(height: 8),
+        CustomTextField(
+          controller: controller,
+          labelText: label,
+          hintText: hintText,
+          keyboardType: keyboardType,
+          validator: validator,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGenderDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Gender',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<String>(
+          value: _selectedGender,
+          decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          ),
+          items: _genderOptions.map((gender) {
+            return DropdownMenuItem<String>(
+              value: gender,
+              child: Text(gender),
+            );
+          }).toList(),
+          onChanged: (String? newValue) {
+            setState(() {
+              _selectedGender = newValue;
+            });
+          },
+          validator: (value) {
+            // Gender is optional, so no validation needed
+            return null;
+          },
         ),
       ],
     );
