@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../services/auth_service.dart';
 import 'auth/login_screen.dart';
 import 'home/home_screen.dart';
@@ -34,44 +35,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     ));
     
     _animationController.forward();
-    
-    // Start listening to auth state changes
-    _startAuthListener();
-  }
-  
-  void _startAuthListener() {
-    // Listen to auth state changes
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      
-      // Listen to auth state changes
-      authService.addListener(() {
-        if (mounted) {
-          _handleAuthStateChange(authService);
-        }
-      });
-      
-      // Initial check after animation
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) {
-          _handleAuthStateChange(authService);
-        }
-      });
-    });
-  }
-  
-  void _handleAuthStateChange(AuthService authService) {
-    if (authService.isAuthenticated) {
-      // User is authenticated, navigate to home
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-      );
-    } else {
-      // User is not authenticated, navigate to login
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LoginScreen()),
-      );
-    }
   }
   
   @override
@@ -140,6 +103,32 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           ),
         ),
       ),
+    );
+  }
+}
+
+class AuthWrapper extends StatelessWidget {
+  const AuthWrapper({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        // Show splash screen while checking auth state
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SplashScreen();
+        }
+        
+        // Navigate based on auth state
+        if (snapshot.hasData && snapshot.data != null) {
+          // User is authenticated, go to home
+          return const HomeScreen();
+        } else {
+          // User is not authenticated, go to login
+          return const LoginScreen();
+        }
+      },
     );
   }
 }
