@@ -331,7 +331,7 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                             
                             // Streak count with modern design
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
@@ -339,12 +339,12 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                     const Color(0xFFFFA726),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(16),
+                                borderRadius: BorderRadius.circular(12),
                                 boxShadow: [
                                   BoxShadow(
                                     color: const Color(0xFFFF8A50).withOpacity(0.3),
-                                    blurRadius: 15,
-                                    offset: const Offset(0, 8),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 6),
                                   ),
                                 ],
                               ),
@@ -352,14 +352,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                 children: [
                                   Icon(
                                     Icons.local_fire_department,
-                                    size: 24,
+                                    size: 18,
                                     color: Colors.white,
                                   ),
-                                  const SizedBox(height: 4),
+                                  const SizedBox(height: 2),
                                   Text(
                                     '${widget.habit.currentStreak}',
                                     style: const TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
                                     ),
@@ -367,7 +367,7 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                   const Text(
                                     'Streak',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 9,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white70,
                                       letterSpacing: 0.5,

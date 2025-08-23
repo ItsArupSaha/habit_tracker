@@ -66,7 +66,7 @@ class AddHabitDialog extends StatefulWidget {
   State<AddHabitDialog> createState() => _AddHabitDialogState();
 }
 
-class _AddHabitDialogState extends State<AddHabitDialog> with TickerProviderStateMixin {
+class _AddHabitDialogState extends State<AddHabitDialog> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _notesController = TextEditingController();
@@ -75,10 +75,6 @@ class _AddHabitDialogState extends State<AddHabitDialog> with TickerProviderStat
   String _selectedFrequency = 'daily';
   DateTime? _startDate;
   bool _isLoading = false;
-  
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _fadeAnimation;
   
   final List<String> _categories = [
     'Health',
@@ -92,34 +88,9 @@ class _AddHabitDialogState extends State<AddHabitDialog> with TickerProviderStat
   final List<String> _frequencies = ['daily', 'weekly'];
   
   @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 400),
-      vsync: this,
-    );
-    _scaleAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.elasticOut,
-    ));
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeOutCubic,
-    ));
-    _animationController.forward();
-  }
-
-  @override
   void dispose() {
     _titleController.dispose();
     _notesController.dispose();
-    _animationController.dispose();
     super.dispose();
   }
   
@@ -169,7 +140,13 @@ class _AddHabitDialogState extends State<AddHabitDialog> with TickerProviderStat
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to create habit: $e'),
+            content: Row(
+              children: [
+                const Icon(Icons.error, color: Colors.white),
+                const SizedBox(width: 12),
+                Text('Failed to create habit: $e'),
+              ],
+            ),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -213,323 +190,247 @@ class _AddHabitDialogState extends State<AddHabitDialog> with TickerProviderStat
   
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animationController,
-      builder: (context, child) {
-        return FadeTransition(
-          opacity: _fadeAnimation,
-          child: ScaleTransition(
-            scale: _scaleAnimation,
-            child: Dialog(
-              backgroundColor: Colors.transparent,
-              child: Container(
-                constraints: const BoxConstraints(maxWidth: 450),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 30,
-                      offset: const Offset(0, 20),
-                    ),
-                  ],
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: 400),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              blurRadius: 20,
+              offset: const Offset(0, 10),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Simple header
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                color: Color(0xFFFF6B35),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
+              ),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.add_task,
+                    color: Colors.white,
+                    size: 24,
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Create New Habit',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            // Form content
+            Padding(
+              padding: const EdgeInsets.all(20),
+              child: Form(
+                key: _formKey,
                 child: Column(
-                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Header with gradient
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [
-                            Color(0xFFFF6B35),
-                            Color(0xFFFF8A50),
+                    // Habit title
+                    CustomTextField(
+                      controller: _titleController,
+                      labelText: 'Habit Title',
+                      hintText: 'e.g., Drink 8 glasses of water',
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Habit title is required';
+                        }
+                        if (value.length < 3) {
+                          return 'Title must be at least 3 characters';
+                        }
+                        return null;
+                      },
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Category and frequency
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedCategory,
+                            decoration: InputDecoration(
+                              labelText: 'Category',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              isDense: true,
+                            ),
+                            items: _categories.map((category) {
+                              return DropdownMenuItem<String>(
+                                value: category,
+                                child: Text(
+                                  category,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedCategory = newValue;
+                                });
+                              }
+                            },
+                            isExpanded: true,
+                          ),
+                        ),
+                        
+                        const SizedBox(width: 8),
+                        
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedFrequency,
+                            decoration: InputDecoration(
+                              labelText: 'Frequency',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              filled: true,
+                              fillColor: Colors.grey[50],
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              isDense: true,
+                            ),
+                            items: _frequencies.map((frequency) {
+                              return DropdownMenuItem<String>(
+                                value: frequency,
+                                child: Text(
+                                  frequency.capitalize(),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedFrequency = newValue;
+                                });
+                              }
+                            },
+                            isExpanded: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 16),
+                    
+                    // Start date
+                    InkWell(
+                      onTap: _selectDate,
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[50],
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.grey[300]!),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_today,
+                              color: const Color(0xFFFF6B35),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              _startDate != null 
+                                  ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
+                                  : 'Start Date (Optional)',
+                              style: TextStyle(
+                                color: _startDate != null 
+                                    ? const Color(0xFF2C3E50)
+                                    : Colors.grey[600],
+                              ),
+                            ),
+                            const Spacer(),
+                            if (_startDate != null)
+                              IconButton(
+                                icon: const Icon(Icons.clear, size: 18),
+                                onPressed: () {
+                                  setState(() {
+                                    _startDate = null;
+                                  });
+                                },
+                              ),
                           ],
                         ),
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(24),
-                          topRight: Radius.circular(24),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 60,
-                            height: 60,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.add_task,
-                              color: Colors.white,
-                              size: 30,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'Create New Habit',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 0.5,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Build a better version of yourself',
-                            style: TextStyle(
-                              color: Colors.white70,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
                       ),
                     ),
                     
-                    // Form content
-                    Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          children: [
-                            // Habit title
-                            CustomTextField(
-                              controller: _titleController,
-                              labelText: 'Habit Title',
-                              hintText: 'e.g., Drink 8 glasses of water',
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Habit title is required';
-                                }
-                                if (value.length < 3) {
-                                  return 'Title must be at least 3 characters';
-                                }
-                                return null;
-                              },
-                            ),
-                            
-                            const SizedBox(height: 20),
-                            
-                            // Category and frequency row
-                            Row(
-                              children: [
-                                // Category dropdown
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[50],
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: DropdownButtonFormField<String>(
-                                      value: _selectedCategory,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Category',
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                        filled: false,
-                                      ),
-                                      items: _categories.map((category) {
-                                        return DropdownMenuItem<String>(
-                                          value: category,
-                                          child: Text(category),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        if (newValue != null) {
-                                          setState(() {
-                                            _selectedCategory = newValue;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                                
-                                const SizedBox(width: 16),
-                                
-                                // Frequency dropdown
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[50],
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: DropdownButtonFormField<String>(
-                                      value: _selectedFrequency,
-                                      decoration: const InputDecoration(
-                                        labelText: 'Frequency',
-                                        border: InputBorder.none,
-                                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                        filled: false,
-                                      ),
-                                      items: _frequencies.map((frequency) {
-                                        return DropdownMenuItem<String>(
-                                          value: frequency,
-                                          child: Text(frequency.capitalize()),
-                                        );
-                                      }).toList(),
-                                      onChanged: (String? newValue) {
-                                        if (newValue != null) {
-                                          setState(() {
-                                            _selectedFrequency = newValue;
-                                          });
-                                        }
-                                      },
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            
-                            const SizedBox(height: 20),
-                            
-                            // Start date
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[50],
-                                borderRadius: BorderRadius.circular(16),
-                                border: Border.all(
-                                  color: Colors.grey[300]!,
-                                  width: 1,
-                                ),
-                              ),
-                              child: InkWell(
-                                onTap: _selectDate,
-                                borderRadius: BorderRadius.circular(16),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.calendar_today,
-                                        color: const Color(0xFFFF6B35),
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 12),
-                                      Text(
-                                        _startDate != null 
-                                            ? '${_startDate!.day}/${_startDate!.month}/${_startDate!.year}'
-                                            : 'Start Date (Optional)',
-                                        style: TextStyle(
-                                          color: _startDate != null 
-                                              ? const Color(0xFF2C3E50)
-                                              : Colors.grey[600],
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      if (_startDate != null)
-                                        IconButton(
-                                          icon: const Icon(Icons.clear, size: 20),
-                                          onPressed: () {
-                                            setState(() {
-                                              _startDate = null;
-                                            });
-                                          },
-                                        ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(height: 20),
-                            
-                            // Notes
-                            CustomTextField(
-                              controller: _notesController,
-                              labelText: 'Notes (Optional)',
-                              hintText: 'Add any additional details...',
-                              maxLines: 3,
-                            ),
-                            
-                            const SizedBox(height: 32),
-                            
-                            // Action buttons
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[100],
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: Colors.grey[300]!,
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: TextButton(
-                                      onPressed: _isLoading ? null : () {
-                                        Navigator.of(context).pop();
-                                      },
-                                      style: TextButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(16),
-                                        ),
-                                      ),
-                                      child: Text(
-                                        'Cancel',
-                                        style: TextStyle(
-                                          color: Colors.grey[700],
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                
-                                const SizedBox(width: 16),
-                                
-                                Expanded(
-                                  child: CustomButton(
-                                    onPressed: _isLoading ? null : _createHabit,
-                                    child: _isLoading
-                                        ? const SizedBox(
-                                            height: 20,
-                                            width: 20,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              color: Colors.white,
-                                            ),
-                                          )
-                                        : const Text(
-                                            'Create Habit',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+                    const SizedBox(height: 16),
+                    
+                    // Notes
+                    CustomTextField(
+                      controller: _notesController,
+                      labelText: 'Notes (Optional)',
+                      hintText: 'Add any additional details...',
+                      maxLines: 2,
+                    ),
+                    
+                    const SizedBox(height: 24),
+                    
+                    // Action buttons
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextButton(
+                            onPressed: _isLoading ? null : () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text('Cancel'),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: CustomButton(
+                            onPressed: _isLoading ? null : _createHabit,
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text('Create Habit'),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
 }
