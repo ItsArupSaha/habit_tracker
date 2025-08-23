@@ -188,371 +188,332 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
-            child: Column(
-              children: [
-                // Modern header with gradient
-                Container(
-                  height: 200,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        const Color(0xFFFF6B35),
-                        const Color(0xFFFF8A50),
-                        const Color(0xFFFFA726),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - MediaQuery.of(context).padding.bottom,
+            ),
+            child: IntrinsicHeight(
+              child: Column(
+                children: [
+                  // Simple header with icon and text
+                  Padding(
+                    padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 40),
+                        
+                        // Habit tracker icon
+                        const Icon(
+                          Icons.person_add,
+                          size: 40,
+                          color: Color(0xFFFF6B35),
+                        ),
+                        
+                        const SizedBox(height: 16),
+                        
+                        const Text(
+                          'Create Account',
+                          style: TextStyle(
+                            color: Color(0xFFFF6B35),
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 8),
+                        
+                        Text(
+                          'Join us to start your habit journey',
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
-                  child: Stack(
-                    children: [
-                      // Background pattern
-                      Positioned.fill(
-                        child: CustomPaint(
-                          painter: _WavePainter(),
-                        ),
+                  
+                  // Theme toggle positioned absolutely
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      
-                      // Content
-                      Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // App icon
-                            Container(
-                              width: 80,
-                              height: 80,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.3),
-                                  width: 2,
-                                ),
-                              ),
-                              child: const Icon(
-                                Icons.person_add,
-                                size: 40,
-                                color: Colors.white,
-                              ),
-                            ),
-                            
-                            const SizedBox(height: 20),
-                            
-                            const Text(
-                              'Join Habit Tracker',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 1.2,
-                              ),
-                            ),
-                            
-                            const SizedBox(height: 8),
-                            
-                            const Text(
-                              'Start building better habits today',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                      child: IconButton(
+                        icon: Consumer<ThemeService>(
+                          builder: (context, themeService, child) {
+                            return Icon(
+                              themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                              color: Colors.grey[700],
+                            );
+                          },
                         ),
+                        onPressed: () {
+                          Provider.of<ThemeService>(context, listen: false).toggleTheme();
+                        },
                       ),
-                      
-                      // Theme toggle
-                      Positioned(
-                        top: 16,
-                        right: 16,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: IconButton(
-                            icon: Consumer<ThemeService>(
-                              builder: (context, themeService, child) {
-                                return Icon(
-                                  themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                                  color: Colors.white,
-                                );
-                              },
-                            ),
-                            onPressed: () {
-                              Provider.of<ThemeService>(context, listen: false).toggleTheme();
-                            },
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                
-                // Form content
-                Expanded(
-                  child: FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: SlideTransition(
-                      position: _slideAnimation,
-                      child: Container(
-                        margin: const EdgeInsets.all(24),
-                        padding: const EdgeInsets.all(24),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.08),
-                              blurRadius: 25,
-                              offset: const Offset(0, 15),
-                            ),
-                          ],
-                        ),
-                        child: Form(
-                          key: _formKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              // Display Name field
-                              CustomTextField(
-                                controller: _displayNameController,
-                                labelText: 'Display Name',
-                                hintText: 'Enter your display name',
-                                prefixIcon: const Icon(Icons.person_outlined),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Display name is required';
-                                  }
-                                  if (value.length < 2) {
-                                    return 'Display name must be at least 2 characters';
-                                  }
-                                  return null;
-                                },
+                  
+                  // Form content
+                  Expanded(
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: SlideTransition(
+                        position: _slideAnimation,
+                        child: Container(
+                          margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+                          padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 20,
+                                offset: const Offset(0, 10),
                               ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Email field
-                              CustomTextField(
-                                controller: _emailController,
-                                labelText: 'Email',
-                                hintText: 'Enter your email',
-                                keyboardType: TextInputType.emailAddress,
-                                prefixIcon: const Icon(Icons.email_outlined),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Email is required';
-                                  }
-                                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                      .hasMatch(value)) {
-                                    return 'Please enter a valid email';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Password field
-                              CustomTextField(
-                                controller: _passwordController,
-                                labelText: 'Password',
-                                hintText: 'Enter your password',
-                                obscureText: _obscurePassword,
-                                prefixIcon: const Icon(Icons.lock_outlined),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.grey[600],
-                                  ),
-                                  onPressed: () {
-                                    setState(() => _obscurePassword = !_obscurePassword);
-                                  },
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Password is required';
-                                  }
-                                  if (value.length < 8) {
-                                    return 'Password must be at least 8 characters';
-                                  }
-                                  if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
-                                      .hasMatch(value)) {
-                                    return 'Password must contain uppercase, lowercase and numbers';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Confirm Password field
-                              CustomTextField(
-                                controller: _confirmPasswordController,
-                                labelText: 'Confirm Password',
-                                hintText: 'Confirm your password',
-                                obscureText: _obscureConfirmPassword,
-                                prefixIcon: const Icon(Icons.lock_outlined),
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscureConfirmPassword
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.grey[600],
-                                  ),
-                                  onPressed: () {
-                                    setState(() =>
-                                        _obscureConfirmPassword = !_obscureConfirmPassword);
-                                  },
-                                ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please confirm your password';
-                                  }
-                                  if (value != _passwordController.text) {
-                                    return 'Passwords do not match';
-                                  }
-                                  return null;
-                                },
-                              ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Gender dropdown
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Colors.grey[300]!,
-                                    width: 1,
-                                  ),
-                                ),
-                                child: DropdownButtonFormField<String>(
-                                  value: _selectedGender,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Gender (Optional)',
-                                    border: InputBorder.none,
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                                    filled: false,
-                                  ),
-                                  items: _genderOptions.map((String gender) {
-                                    return DropdownMenuItem<String>(
-                                      value: gender,
-                                      child: Text(gender),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? newValue) {
-                                    setState(() {
-                                      _selectedGender = newValue;
-                                    });
-                                  },
-                                ),
-                              ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Age, Weight, Height row
-                              Row(
-                                children: [
-                                  // Age field
-                                  Expanded(
-                                    child: CustomTextField(
-                                      controller: _ageController,
-                                      labelText: 'Age (Optional)',
-                                      hintText: 'Age in years',
-                                      keyboardType: TextInputType.number,
-                                      prefixIcon: const Icon(Icons.cake_outlined),
-                                      validator: (value) {
-                                        if (value != null && value.isNotEmpty) {
-                                          final int age = int.tryParse(value) ?? 0;
-                                          if (age < 0 || age > 120) {
-                                            return 'Age must be between 0 and 120';
-                                          }
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                  
-                                  const SizedBox(width: 16),
-                                  
-                                  // Weight field
-                                  Expanded(
-                                    child: CustomTextField(
-                                      controller: _weightController,
-                                      labelText: 'Weight (Optional)',
-                                      hintText: 'Weight in kg',
-                                      keyboardType: TextInputType.number,
-                                      prefixIcon: const Icon(Icons.fitness_center_outlined),
-                                      validator: (value) {
-                                        if (value != null && value.isNotEmpty) {
-                                          final double weight = double.tryParse(value) ?? 0.0;
-                                          if (weight < 0.0) {
-                                            return 'Weight must be positive';
-                                          }
-                                        }
-                                        return null;
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              
-                              const SizedBox(height: 20),
-                              
-                              // Height field
-                              CustomTextField(
-                                controller: _heightController,
-                                labelText: 'Height (Optional)',
-                                hintText: 'Enter your height in cm',
-                                keyboardType: TextInputType.number,
-                                prefixIcon: const Icon(Icons.height_outlined),
-                                validator: (value) {
-                                  if (value != null && value.isNotEmpty) {
-                                    final double height = double.tryParse(value) ?? 0.0;
-                                    if (height < 0.0) {
-                                      return 'Height must be positive';
+                            ],
+                          ),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                // Display name field
+                                CustomTextField(
+                                  controller: _displayNameController,
+                                  labelText: 'Display Name',
+                                  hintText: 'Enter your display name',
+                                  prefixIcon: const Icon(Icons.person_outline),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Display name is required';
                                     }
-                                  }
-                                  return null;
-                                },
-                              ),
-                              
-                              const SizedBox(height: 24),
-                              
-                              // Terms and conditions checkbox
-                              Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[50],
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: Colors.grey[300]!,
-                                    width: 1,
-                                  ),
+                                    if (value.length < 2) {
+                                      return 'Display name must be at least 2 characters';
+                                    }
+                                    return null;
+                                  },
                                 ),
-                                child: Row(
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Email field
+                                CustomTextField(
+                                  controller: _emailController,
+                                  labelText: 'Email',
+                                  hintText: 'Enter your email',
+                                  keyboardType: TextInputType.emailAddress,
+                                  prefixIcon: const Icon(Icons.email_outlined),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Email is required';
+                                    }
+                                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                        .hasMatch(value)) {
+                                      return 'Please enter a valid email';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Password fields
+                                CustomTextField(
+                                  controller: _passwordController,
+                                  labelText: 'Password',
+                                  hintText: 'Enter password',
+                                  obscureText: _obscurePassword,
+                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscurePassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.grey[600],
+                                    ),
+                                    onPressed: () {
+                                      setState(() => _obscurePassword = !_obscurePassword);
+                                    },
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Password is required';
+                                    }
+                                    if (value.length < 6) {
+                                      return 'Password must be at least 6 characters';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                CustomTextField(
+                                  controller: _confirmPasswordController,
+                                  labelText: 'Confirm Password',
+                                  hintText: 'Confirm password',
+                                  obscureText: _obscureConfirmPassword,
+                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _obscureConfirmPassword
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                      color: Colors.grey[600],
+                                    ),
+                                    onPressed: () {
+                                      setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                                    },
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Please confirm your password';
+                                    }
+                                    if (value != _passwordController.text) {
+                                      return 'Passwords do not match';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Personal info row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomTextField(
+                                        controller: _ageController,
+                                        labelText: 'Age',
+                                        hintText: 'Age',
+                                        keyboardType: TextInputType.number,
+                                        prefixIcon: const Icon(Icons.calendar_today),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Age is required';
+                                          }
+                                          final age = int.tryParse(value);
+                                          if (age == null || age < 13 || age > 120) {
+                                            return 'Please enter a valid age';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    
+                                    const SizedBox(width: 12),
+                                    
+                                    Expanded(
+                                      child: DropdownButtonFormField<String>(
+                                        value: _selectedGender,
+                                        decoration: InputDecoration(
+                                          labelText: 'Gender',
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          filled: true,
+                                          fillColor: Colors.grey[50],
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                          isDense: true,
+                                        ),
+                                        items: _genderOptions.map((gender) {
+                                          return DropdownMenuItem<String>(
+                                            value: gender,
+                                            child: Text(gender),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            _selectedGender = newValue;
+                                          });
+                                        },
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Gender is required';
+                                          }
+                                          return null;
+                                        },
+                                        isExpanded: true,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 16),
+                                
+                                // Physical info row
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: CustomTextField(
+                                        controller: _weightController,
+                                        labelText: 'Weight (kg)',
+                                        hintText: 'Weight',
+                                        keyboardType: TextInputType.number,
+                                        prefixIcon: const Icon(Icons.monitor_weight),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Weight is required';
+                                          }
+                                          final weight = double.tryParse(value);
+                                          if (weight == null || weight < 20 || weight > 300) {
+                                            return 'Please enter a valid weight';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    
+                                    const SizedBox(width: 12),
+                                    
+                                    Expanded(
+                                      child: CustomTextField(
+                                        controller: _heightController,
+                                        labelText: 'Height (cm)',
+                                        hintText: 'Height',
+                                        keyboardType: TextInputType.number,
+                                        prefixIcon: const Icon(Icons.height),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Height is required';
+                                          }
+                                          final height = double.tryParse(value);
+                                          if (height == null || height < 100 || height > 250) {
+                                            return 'Please enter a valid height';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                
+                                const SizedBox(height: 20),
+                                
+                                // Terms and conditions
+                                Row(
                                   children: [
                                     Checkbox(
                                       value: _acceptedTerms,
-                                      activeColor: const Color(0xFFFF6B35),
-                                      onChanged: (bool? value) {
+                                      onChanged: (value) {
                                         setState(() {
                                           _acceptedTerms = value ?? false;
                                         });
                                       },
+                                      activeColor: const Color(0xFFFF6B35),
                                     ),
                                     Expanded(
                                       child: GestureDetector(
@@ -562,110 +523,77 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                           });
                                         },
                                         child: Text(
-                                          'I agree to the Terms and Conditions',
+                                          'I accept the terms and conditions',
                                           style: TextStyle(
                                             color: Colors.grey[700],
                                             fontSize: 14,
-                                            fontWeight: FontWeight.w500,
                                           ),
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
-                              ),
-                              
-                              const SizedBox(height: 32),
-                              
-                              // Register button
-                              CustomButton(
-                                onPressed: _isLoading ? null : _register,
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.white,
-                                        ),
-                                      )
-                                    : const Text('Create Account'),
-                              ),
-                              
-                              const SizedBox(height: 24),
-                              
-                              // Login link
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Already have an account? ',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: const Color(0xFFFF6B35),
-                                    ),
-                                    child: const Text(
-                                      'Login',
+                                
+                                const SizedBox(height: 24),
+                                
+                                // Register button
+                                CustomButton(
+                                  onPressed: _isLoading ? null : _register,
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                          height: 20,
+                                          width: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      : const Text('Create Account'),
+                                ),
+                                
+                                const SizedBox(height: 20),
+                                
+                                // Login link
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      'Already have an account? ',
                                       style: TextStyle(
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 16,
+                                        color: Colors.grey[600],
+                                        fontSize: 14,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                      style: TextButton.styleFrom(
+                                        foregroundColor: const Color(0xFFFF6B35),
+                                      ),
+                                      child: const Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
       ),
     );
   }
-}
-
-class _WavePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.fill;
-    
-    final path = Path();
-    path.moveTo(0, size.height * 0.8);
-    path.quadraticBezierTo(
-      size.width * 0.25,
-      size.height * 0.7,
-      size.width * 0.5,
-      size.height * 0.8,
-    );
-    path.quadraticBezierTo(
-      size.width * 0.75,
-      size.height * 0.9,
-      size.width,
-      size.height * 0.8,
-    );
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    
-    canvas.drawPath(path, paint);
-  }
-  
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
