@@ -13,11 +13,13 @@ class HabitsTab extends StatefulWidget {
   State<HabitsTab> createState() => _HabitsTabState();
 }
 
-class _HabitsTabState extends State<HabitsTab> {
+class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
   final HabitService _habitService = HabitService();
   List<Habit> _habits = [];
   bool _isLoading = true;
   String? _selectedCategory;
+  late AnimationController _fadeController;
+  late AnimationController _slideController;
   
   final List<String> _categories = [
     'All',
@@ -32,7 +34,22 @@ class _HabitsTabState extends State<HabitsTab> {
   @override
   void initState() {
     super.initState();
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this,
+    );
+    _slideController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
     _loadHabits();
+  }
+
+  @override
+  void dispose() {
+    _fadeController.dispose();
+    _slideController.dispose();
+    super.dispose();
   }
   
   Future<void> _loadHabits() async {
@@ -46,6 +63,8 @@ class _HabitsTabState extends State<HabitsTab> {
           _habits = habits;
           _isLoading = false;
         });
+        _fadeController.forward();
+        _slideController.forward();
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -70,97 +89,237 @@ class _HabitsTabState extends State<HabitsTab> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          // Category filter
-          Container(
-            padding: const EdgeInsets.all(16),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: _categories.map((category) {
-                  final isSelected = _selectedCategory == category || 
-                      (_selectedCategory == null && category == 'All');
-                  
-                  return Padding(
-                    padding: const EdgeInsets.only(right: 8),
-                    child: FilterChip(
-                      label: Text(category),
-                      selected: isSelected,
-                      onSelected: (selected) {
-                        setState(() {
-                          _selectedCategory = selected ? category : null;
-                        });
-                      },
+      backgroundColor: const Color(0xFFF8F9FA),
+      body: CustomScrollView(
+        slivers: [
+          // Modern header with gradient
+          SliverAppBar(
+            expandedHeight: 120,
+            floating: false,
+            pinned: true,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      const Color(0xFFFF6B35),
+                      const Color(0xFFFF8A50),
+                      const Color(0xFFFFA726),
+                    ],
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.1),
+                  ),
+                  child: const Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 40),
+                        Text(
+                          'My Habits',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.2,
+                          ),
+                        ),
+                        Text(
+                          'Track your progress, build your future',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
                     ),
-                  );
-                }).toList(),
+                  ),
+                ),
               ),
             ),
           ),
           
-          // Habits list
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _filteredHabits.isEmpty
-                    ? _buildEmptyState()
-                    : RefreshIndicator(
-                        onRefresh: _loadHabits,
-                        child: ListView.builder(
-                          padding: const EdgeInsets.all(16),
-                          itemCount: _filteredHabits.length,
-                          itemBuilder: (context, index) {
+          // Category filter with modern design
+          SliverToBoxAdapter(
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Categories',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2C3E50),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _categories.map((category) {
+                        final isSelected = _selectedCategory == category || 
+                            (_selectedCategory == null && category == 'All');
+                        
+                        return Container(
+                          margin: const EdgeInsets.only(right: 12),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _selectedCategory = _selectedCategory == category ? null : category;
+                                });
+                              },
+                              borderRadius: BorderRadius.circular(25),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                decoration: BoxDecoration(
+                                  gradient: isSelected ? LinearGradient(
+                                    colors: [
+                                      const Color(0xFFFF6B35),
+                                      const Color(0xFFFF8A50),
+                                    ],
+                                  ) : null,
+                                  color: isSelected ? null : Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(25),
+                                  border: isSelected ? null : Border.all(
+                                    color: Colors.grey[300]!,
+                                    width: 1,
+                                  ),
+                                ),
+                                child: Text(
+                                  category,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: isSelected ? Colors.white : Colors.grey[700],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          
+          // Habits list with modern cards
+          _isLoading
+              ? const SliverFillRemaining(
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFFFF6B35),
+                    ),
+                  ),
+                )
+              : _filteredHabits.isEmpty
+                  ? SliverFillRemaining(
+                      child: FadeTransition(
+                        opacity: _fadeController,
+                        child: _buildEmptyState(),
+                      ),
+                    )
+                  : SliverPadding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      sliver: SliverList(
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) {
                             final habit = _filteredHabits[index];
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: HabitCard(
-                                habit: habit,
-                                onToggleCompletion: (completed) async {
-                                  await _toggleHabitCompletion(habit, completed);
-                                },
-                                onEdit: () => _editHabit(habit),
-                                onDelete: () => _deleteHabit(habit),
+                            return SlideTransition(
+                              position: Tween<Offset>(
+                                begin: const Offset(0, 0.3),
+                                end: Offset.zero,
+                              ).animate(CurvedAnimation(
+                                parent: _slideController,
+                                curve: Interval(
+                                  index * 0.1,
+                                  1.0,
+                                  curve: Curves.easeOutCubic,
+                                ),
+                              )),
+                              child: Container(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                child: HabitCard(
+                                  habit: habit,
+                                  onToggleCompletion: (completed) => _toggleHabitCompletion(habit, completed),
+                                  onEdit: () => _editHabit(habit),
+                                  onDelete: () => _deleteHabit(habit),
+                                ),
                               ),
                             );
                           },
+                          childCount: _filteredHabits.length,
                         ),
                       ),
-          ),
+                    ),
         ],
       ),
-      floatingActionButton: AddHabitFAB(
-        onHabitAdded: (habit) {
-          setState(() {
-            _habits.add(habit);
-          });
-        },
-      ),
+      floatingActionButton: AddHabitFAB(onHabitAdded: (habit) {
+        setState(() {
+          _habits.insert(0, habit);
+        });
+      }),
     );
   }
   
   Widget _buildEmptyState() {
-    return Center(
+    return Container(
+      padding: const EdgeInsets.all(32),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.track_changes_outlined,
-            size: 80,
-            color: Colors.grey[400],
+          Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: const Color(0xFFFF6B35).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(
+              Icons.add_task,
+              size: 60,
+              color: Color(0xFFFF6B35),
+            ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
           Text(
             'No habits yet',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: Colors.grey[600],
+              color: const Color(0xFF2C3E50),
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           Text(
             'Tap the + button to create your first habit',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[500],
+              color: Colors.grey[600],
+              fontSize: 16,
             ),
             textAlign: TextAlign.center,
           ),
@@ -179,7 +338,6 @@ class _HabitsTabState extends State<HabitsTab> {
           completed,
         );
         
-        // Update local state
         setState(() {
           final index = _habits.indexWhere((h) => h.id == habit.id);
           if (index != -1) {
@@ -203,7 +361,6 @@ class _HabitsTabState extends State<HabitsTab> {
   }
   
   void _editHabit(Habit habit) {
-    // TODO: Navigate to edit habit screen
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Edit feature coming soon!')),
     );
