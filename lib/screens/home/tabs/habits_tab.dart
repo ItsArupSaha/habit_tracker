@@ -171,18 +171,25 @@ class _HabitsTabState extends State<HabitsTab> {
   
   Future<void> _toggleHabitCompletion(Habit habit, bool completed) async {
     try {
-      await _habitService.toggleHabitCompletion(habit.id, completed);
-      
-      // Update local state
-      setState(() {
-        final index = _habits.indexWhere((h) => h.id == habit.id);
-        if (index != -1) {
-          _habits[index] = habit.copyWith(
-            isCompletedToday: completed,
-            currentStreak: completed ? habit.currentStreak + 1 : 0,
-          );
-        }
-      });
+      final authService = Provider.of<AuthService>(context, listen: false);
+      if (authService.currentUser != null) {
+        await _habitService.toggleHabitCompletion(
+          authService.currentUser!.uid,
+          habit.id,
+          completed,
+        );
+        
+        // Update local state
+        setState(() {
+          final index = _habits.indexWhere((h) => h.id == habit.id);
+          if (index != -1) {
+            _habits[index] = habit.copyWith(
+              isCompletedToday: completed,
+              currentStreak: completed ? habit.currentStreak + 1 : 0,
+            );
+          }
+        });
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -224,15 +231,18 @@ class _HabitsTabState extends State<HabitsTab> {
     
     if (confirmed == true) {
       try {
-        await _habitService.deleteHabit(habit.id);
-        setState(() {
-          _habits.removeWhere((h) => h.id == habit.id);
-        });
-        
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Habit deleted successfully')),
-          );
+        final authService = Provider.of<AuthService>(context, listen: false);
+        if (authService.currentUser != null) {
+          await _habitService.deleteHabit(authService.currentUser!.uid, habit.id);
+          setState(() {
+            _habits.removeWhere((h) => h.id == habit.id);
+          });
+          
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Habit deleted successfully')),
+            );
+          }
         }
       } catch (e) {
         if (mounted) {

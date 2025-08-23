@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../services/auth_service.dart';
-import '../../widgets/custom_text_field.dart';
+import '../../services/theme_service.dart';
 import '../../widgets/custom_button.dart';
+import '../../widgets/custom_text_field.dart';
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -21,15 +23,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _ageController = TextEditingController();
   final _weightController = TextEditingController();
   final _heightController = TextEditingController();
-  
+
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _acceptedTerms = false;
   String? _selectedGender;
-  
+
   final List<String> _genderOptions = ['Male', 'Female', 'Other'];
-  
+
   @override
   void dispose() {
     _displayNameController.dispose();
@@ -41,7 +43,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     _heightController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_acceptedTerms) {
@@ -53,9 +55,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
       return;
     }
-    
+
     setState(() => _isLoading = true);
-    
+
     try {
       final authService = Provider.of<AuthService>(context, listen: false);
       final result = await authService.registerUser(
@@ -64,12 +66,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password: _passwordController.text,
         gender: _selectedGender,
         otherDetails: {
-          'age': _ageController.text.trim().isNotEmpty ? int.tryParse(_ageController.text.trim()) : null,
-          'weight': _weightController.text.trim().isNotEmpty ? double.tryParse(_weightController.text.trim()) : null,
-          'height': _heightController.text.trim().isNotEmpty ? double.tryParse(_heightController.text.trim()) : null,
+          'age': _ageController.text.trim().isNotEmpty
+              ? int.tryParse(_ageController.text.trim())
+              : null,
+          'weight': _weightController.text.trim().isNotEmpty
+              ? double.tryParse(_weightController.text.trim())
+              : null,
+          'height': _heightController.text.trim().isNotEmpty
+              ? double.tryParse(_heightController.text.trim())
+              : null,
         },
       );
-      
+
       if (result['success']) {
         // Registration successful, show success message and redirect to login
         ScaffoldMessenger.of(context).showSnackBar(
@@ -78,10 +86,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             backgroundColor: Colors.green,
           ),
         );
-        
+
         // Wait a moment for the snackbar to show, then navigate to login
         await Future.delayed(const Duration(seconds: 1));
-        
+
         if (mounted) {
           // Navigate to login screen and clear the navigation stack
           Navigator.of(context).pushAndRemoveUntil(
@@ -111,13 +119,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Create Account'),
         elevation: 0,
+        actions: [
+          // Theme toggle button
+          IconButton(
+            icon: Consumer<ThemeService>(
+              builder: (context, themeService, child) {
+                return Icon(
+                  themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                );
+              },
+            ),
+            onPressed: () {
+              Provider.of<ThemeService>(context, listen: false).toggleTheme();
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -131,23 +154,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 Text(
                   'Join Habit Tracker',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+                        fontWeight: FontWeight.bold,
+                      ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 8),
-                
+
                 Text(
                   'Start building better habits today',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.grey[600],
-                  ),
+                        color: Colors.grey[600],
+                      ),
                   textAlign: TextAlign.center,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Display Name field
                 CustomTextField(
                   controller: _displayNameController,
@@ -164,9 +187,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Email field
                 CustomTextField(
                   controller: _emailController,
@@ -178,15 +201,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Email is required';
                     }
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                        .hasMatch(value)) {
                       return 'Please enter a valid email';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Password field
                 CustomTextField(
                   controller: _passwordController,
@@ -196,7 +220,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icons.lock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                      _obscurePassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
                       setState(() => _obscurePassword = !_obscurePassword);
@@ -209,15 +235,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     if (value.length < 8) {
                       return 'Password must be at least 8 characters';
                     }
-                    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)').hasMatch(value)) {
+                    if (!RegExp(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)')
+                        .hasMatch(value)) {
                       return 'Password must contain uppercase, lowercase and numbers';
                     }
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Confirm Password field
                 CustomTextField(
                   controller: _confirmPasswordController,
@@ -227,10 +254,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   prefixIcon: Icons.lock_outlined,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscureConfirmPassword ? Icons.visibility : Icons.visibility_off,
+                      _obscureConfirmPassword
+                          ? Icons.visibility
+                          : Icons.visibility_off,
                     ),
                     onPressed: () {
-                      setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
+                      setState(() =>
+                          _obscureConfirmPassword = !_obscureConfirmPassword);
                     },
                   ),
                   validator: (value) {
@@ -243,9 +273,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Gender dropdown
                 DropdownButtonFormField<String>(
                   value: _selectedGender,
@@ -270,9 +300,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     });
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Age field
                 CustomTextField(
                   controller: _ageController,
@@ -290,9 +320,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Weight field
                 CustomTextField(
                   controller: _weightController,
@@ -310,9 +340,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 20),
-                
+
                 // Height field
                 CustomTextField(
                   controller: _heightController,
@@ -330,9 +360,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     return null;
                   },
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Terms and conditions checkbox
                 Row(
                   children: [
@@ -359,9 +389,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ],
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 // Register button
                 CustomButton(
                   onPressed: _isLoading ? null : _register,
@@ -373,9 +403,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         )
                       : const Text('Create Account'),
                 ),
-                
+
                 const SizedBox(height: 24),
-                
+
                 // Login link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

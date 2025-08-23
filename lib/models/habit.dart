@@ -30,28 +30,40 @@ class Habit {
   
   // Create from Firestore document
   factory Habit.fromFirestore(DocumentSnapshot doc) {
-    final data = doc.data() as Map<String, dynamic>;
-    
-    return Habit(
-      id: doc.id,
-      userId: data['userId'] ?? '',
-      title: data['title'] ?? '',
-      category: data['category'] ?? '',
-      frequency: data['frequency'] ?? 'daily',
-      startDate: data['startDate'] != null 
-          ? (data['startDate'] as Timestamp).toDate()
-          : null,
-      notes: data['notes'],
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
-      currentStreak: data['currentStreak'] ?? 0,
-      completionHistory: (data['completionHistory'] as List<dynamic>?)
-          ?.map((timestamp) => (timestamp as Timestamp).toDate())
-          .toList() ?? [],
-      isCompletedToday: _isCompletedToday(
-        data['completionHistory'] as List<dynamic>? ?? [],
-        data['frequency'] ?? 'daily',
-      ),
-    );
+    try {
+      print('Parsing habit document: ${doc.id}');
+      final data = doc.data() as Map<String, dynamic>;
+      print('Document data keys: ${data.keys.toList()}');
+      
+      final habit = Habit(
+        id: doc.id,
+        userId: data['userId'] ?? '',
+        title: data['title'] ?? '',
+        category: data['category'] ?? '',
+        frequency: data['frequency'] ?? 'daily',
+        startDate: data['startDate'] != null 
+            ? (data['startDate'] as Timestamp).toDate()
+            : null,
+        notes: data['notes'],
+        createdAt: (data['createdAt'] as Timestamp).toDate(),
+        currentStreak: data['currentStreak'] ?? 0,
+        completionHistory: (data['completionHistory'] as List<dynamic>?)
+            ?.map((timestamp) => (timestamp as Timestamp).toDate())
+            .toList() ?? [],
+        isCompletedToday: _isCompletedToday(
+          data['completionHistory'] as List<dynamic>? ?? [],
+          data['frequency'] ?? 'daily',
+        ),
+      );
+      
+      print('Successfully parsed habit: ${habit.title}');
+      return habit;
+    } catch (e) {
+      print('Error parsing habit document: $e');
+      print('Document ID: ${doc.id}');
+      print('Document data: ${doc.data()}');
+      rethrow;
+    }
   }
   
   // Convert to Firestore document
