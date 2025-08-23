@@ -229,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Colors.grey[200],
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(

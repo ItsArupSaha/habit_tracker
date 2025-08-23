@@ -146,40 +146,53 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                   decoration: InputDecoration(
                     labelText: widget.labelText,
                     hintText: widget.hintText,
-                    prefixIcon: widget.prefixIcon != null ? Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Icon(
-                        (widget.prefixIcon as Icon).icon,
-                        color: _isFocused 
-                            ? const Color(0xFFFF6B35)
-                            : Colors.grey[600],
-                        size: 20,
-                      ),
-                    ) : null,
+                    prefixIcon: widget.prefixIcon,
                     suffixIcon: widget.suffixIcon,
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.only(
-                      left: widget.prefixIcon != null ? 0 : 20,
-                      right: widget.suffixIcon != null ? 0 : 20,
-                      top: 20,
-                      bottom: 20,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[300]!,
+                        width: 2,
+                      ),
                     ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[300]!,
+                        width: 2,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Color(0xFFFF6B35),
+                        width: 2,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.red,
+                        width: 2,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(
+                        color: Colors.red,
+                        width: 2,
+                      ),
+                    ),
+                    filled: true,
+                    fillColor: _isFocused ? Colors.white : Colors.grey[100],
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     labelStyle: TextStyle(
-                      color: _isFocused 
-                          ? const Color(0xFFFF6B35)
-                          : Colors.grey[600],
-                      fontSize: 14,
+                      color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
                     hintStyle: TextStyle(
                       color: Colors.grey[400],
                       fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    counterText: widget.counterText,
-                    counterStyle: TextStyle(
-                      color: Colors.grey[500],
-                      fontSize: 12,
                     ),
                   ),
                 ),
