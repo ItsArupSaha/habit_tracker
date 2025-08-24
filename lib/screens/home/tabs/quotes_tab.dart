@@ -5,6 +5,7 @@ import '../../../services/auth_service.dart';
 import '../../../services/quotes_service.dart';
 import '../../../models/quote.dart';
 import '../../../widgets/quote_card.dart';
+import '../../../screens/favorite_quotes_page.dart';
 
 class QuotesTab extends StatefulWidget {
   const QuotesTab({super.key});
@@ -68,33 +69,126 @@ class _QuotesTabState extends State<QuotesTab> {
       backgroundColor: isDark 
           ? const Color(0xFF0A0E21) 
           : const Color(0xFFF8F9FA),
-      body: _isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-                color: const Color(0xFFFF6B35),
-              ),
-            )
-          : RefreshIndicator(
-              onRefresh: _refreshQuotes,
-              color: const Color(0xFFFF6B35),
-              child: _quotes.isEmpty
-                  ? _buildEmptyState()
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _quotes.length,
-                      itemBuilder: (context, index) {
-                        final quote = _quotes[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 16),
-                          child: QuoteCard(
-                            quote: quote,
-                            onFavorite: () => _toggleFavorite(quote),
-                            onCopy: () => _copyQuote(quote),
-                          ),
-                        );
-                      },
+      body: Column(
+        children: [
+          // Header with favorites button
+          Container(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Daily Quotes',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: isDark 
+                        ? const Color(0xFFE5E7EB)
+                        : const Color(0xFF2C3E50),
+                  ),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: isDark 
+                        ? const Color(0xFF1E2337) 
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark 
+                            ? Colors.black.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                    border: Border.all(
+                      color: isDark 
+                          ? const Color(0xFF2A3149)
+                          : Colors.grey.withOpacity(0.2),
+                      width: 1,
                     ),
+                  ),
+                  child: IconButton(
+                    icon: Stack(
+                      children: [
+                        Icon(
+                          Icons.favorite,
+                          color: const Color(0xFFFF6B35),
+                          size: 24,
+                        ),
+                        if (_quotes.where((q) => q.isFavorite).isNotEmpty)
+                          Positioned(
+                            right: 0,
+                            top: 0,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              constraints: const BoxConstraints(
+                                minWidth: 16,
+                                minHeight: 16,
+                              ),
+                              child: Text(
+                                '${_quotes.where((q) => q.isFavorite).length}',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const FavoriteQuotesPage(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
+          ),
+          
+          // Quotes list
+          Expanded(
+            child: _isLoading
+                ? Center(
+                    child: CircularProgressIndicator(
+                      color: const Color(0xFFFF6B35),
+                    ),
+                  )
+                : RefreshIndicator(
+                    onRefresh: _refreshQuotes,
+                    color: const Color(0xFFFF6B35),
+                    child: _quotes.isEmpty
+                        ? _buildEmptyState()
+                        : ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: _quotes.length,
+                            itemBuilder: (context, index) {
+                              final quote = _quotes[index];
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 16),
+                                child: QuoteCard(
+                                  quote: quote,
+                                  onFavorite: () => _toggleFavorite(quote),
+                                  onCopy: () => _copyQuote(quote),
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+          ),
+        ],
+      ),
     );
   }
   
