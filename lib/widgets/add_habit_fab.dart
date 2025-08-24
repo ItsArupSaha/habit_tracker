@@ -190,20 +190,33 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
   
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Dialog(
       backgroundColor: Colors.transparent,
       child: Container(
         constraints: const BoxConstraints(maxWidth: 400),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: isDark 
+              ? const Color(0xFF1E2337) 
+              : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: isDark 
+                  ? Colors.black.withOpacity(0.4)
+                  : Colors.black.withOpacity(0.2),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
           ],
+          border: Border.all(
+            color: isDark 
+                ? const Color(0xFF2A3149)
+                : Colors.grey.withOpacity(0.2),
+            width: 1,
+          ),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -276,9 +289,16 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.grey[50],
+                              fillColor: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey[50],
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               isDense: true,
+                              labelStyle: TextStyle(
+                                color: isDark 
+                                    ? const Color(0xFF9CA3AF)
+                                    : Colors.grey[600],
+                              ),
                             ),
                             items: _categories.map((category) {
                               return DropdownMenuItem<String>(
@@ -286,6 +306,11 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                 child: Text(
                                   category,
                                   overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: isDark 
+                                        ? const Color(0xFFE5E7EB)
+                                        : const Color(0xFF2C3E50),
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -297,6 +322,9 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                               }
                             },
                             isExpanded: true,
+                            dropdownColor: isDark 
+                                ? const Color(0xFF2A3149)
+                                : Colors.white,
                           ),
                         ),
                         
@@ -311,9 +339,16 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               filled: true,
-                              fillColor: Colors.grey[50],
+                              fillColor: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey[50],
                               contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                               isDense: true,
+                              labelStyle: TextStyle(
+                                color: isDark 
+                                    ? const Color(0xFF9CA3AF)
+                                    : Colors.grey[600],
+                              ),
                             ),
                             items: _frequencies.map((frequency) {
                               return DropdownMenuItem<String>(
@@ -321,6 +356,11 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                 child: Text(
                                   frequency.capitalize(),
                                   overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: isDark 
+                                        ? const Color(0xFFE5E7EB)
+                                        : const Color(0xFF2C3E50),
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -332,6 +372,9 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                               }
                             },
                             isExpanded: true,
+                            dropdownColor: isDark 
+                                ? const Color(0xFF2A3149)
+                                : Colors.white,
                           ),
                         ),
                       ],
@@ -346,9 +389,15 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.grey[50],
+                          color: isDark 
+                              ? const Color(0xFF2A3149)
+                              : Colors.grey[50],
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.grey[300]!),
+                          border: Border.all(
+                            color: isDark 
+                                ? const Color(0xFF3A4159)
+                                : Colors.grey[300]!,
+                          ),
                         ),
                         child: Row(
                           children: [
@@ -364,14 +413,24 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                   : 'Start Date (Optional)',
                               style: TextStyle(
                                 color: _startDate != null 
-                                    ? const Color(0xFF2C3E50)
-                                    : Colors.grey[600],
+                                    ? (isDark 
+                                        ? const Color(0xFFE5E7EB)
+                                        : const Color(0xFF2C3E50))
+                                    : (isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : Colors.grey[600]),
                               ),
                             ),
                             const Spacer(),
                             if (_startDate != null)
                               IconButton(
-                                icon: const Icon(Icons.clear, size: 18),
+                                icon: Icon(
+                                  Icons.clear, 
+                                  size: 18,
+                                  color: isDark 
+                                      ? const Color(0xFF9CA3AF)
+                                      : Colors.grey[600],
+                                ),
                                 onPressed: () {
                                   setState(() {
                                     _startDate = null;
@@ -399,17 +458,50 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextButton(
-                            onPressed: _isLoading ? null : () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text('Cancel'),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey[100],
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color: isDark 
+                                    ? const Color(0xFF3A4159)
+                                    : Colors.grey[300]!,
+                                width: 1.5,
+                              ),
+                            ),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: _isLoading ? null : () {
+                                  Navigator.of(context).pop();
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 14),
+                                  child: Center(
+                                    child: Text(
+                                      'Cancel',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark 
+                                            ? const Color(0xFF9CA3AF)
+                                            : const Color(0xFF6B7280),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           child: CustomButton(
                             onPressed: _isLoading ? null : _createHabit,
+                            height: 48,
                             child: _isLoading
                                 ? const SizedBox(
                                     height: 20,
@@ -419,7 +511,13 @@ class _AddHabitDialogState extends State<AddHabitDialog> {
                                       color: Colors.white,
                                     ),
                                   )
-                                : const Text('Create Habit'),
+                                : const Text(
+                                    'Create Habit',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                           ),
                         ),
                       ],
