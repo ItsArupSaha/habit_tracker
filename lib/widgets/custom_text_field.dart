@@ -84,6 +84,9 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -102,25 +105,31 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
               },
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark 
+                      ? const Color(0xFF2A3149)
+                      : Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
                     color: _isFocused 
                         ? const Color(0xFFFF6B35)
-                        : Colors.grey[300]!,
+                        : isDark 
+                            ? const Color(0xFF3A4159)
+                            : Colors.grey[300]!,
                     width: _isFocused ? 2.0 : 1.5,
                   ),
                   boxShadow: _isFocused ? [
                     BoxShadow(
-                      color: const Color(0xFFFF6B35).withOpacity(0.2),
-                      blurRadius: 15,
-                      offset: const Offset(0, 5),
+                      color: const Color(0xFFFF6B35).withOpacity(isDark ? 0.4 : 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8),
                     ),
                   ] : [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 3),
+                      color: isDark 
+                          ? Colors.black.withOpacity(0.3)
+                          : Colors.black.withOpacity(0.05),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
                     ),
                   ],
                 ),
@@ -140,7 +149,9 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                   onFieldSubmitted: widget.onFieldSubmitted,
                   style: TextStyle(
                     fontSize: 16,
-                    color: const Color(0xFF2C3E50),
+                    color: isDark 
+                        ? const Color(0xFFE5E7EB)
+                        : const Color(0xFF2C3E50),
                     fontWeight: FontWeight.w500,
                   ),
                   decoration: InputDecoration(
@@ -151,14 +162,22 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[300]!,
+                        color: _isFocused 
+                            ? const Color(0xFFFF6B35)
+                            : isDark 
+                                ? const Color(0xFF3A4159)
+                                : Colors.grey[300]!,
                         width: 2,
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
-                        color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[300]!,
+                        color: _isFocused 
+                            ? const Color(0xFFFF6B35)
+                            : isDark 
+                                ? const Color(0xFF3A4159)
+                                : Colors.grey[300]!,
                         width: 2,
                       ),
                     ),
@@ -184,15 +203,28 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                       ),
                     ),
                     filled: true,
-                    fillColor: _isFocused ? Colors.white : Colors.grey[100],
+                    fillColor: _isFocused 
+                        ? (isDark ? const Color(0xFF2A3149) : Colors.white)
+                        : (isDark ? const Color(0xFF2A3149) : Colors.grey[50]),
                     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                     labelStyle: TextStyle(
-                      color: _isFocused ? const Color(0xFFFF6B35) : Colors.grey[600],
+                      color: _isFocused 
+                          ? const Color(0xFFFF6B35)
+                          : isDark 
+                              ? const Color(0xFF9CA3AF)
+                              : Colors.grey[600],
                       fontWeight: FontWeight.w500,
                     ),
                     hintStyle: TextStyle(
-                      color: Colors.grey[400],
+                      color: isDark 
+                          ? const Color(0xFF6B7280)
+                          : Colors.grey[400],
                       fontSize: 14,
+                    ),
+                    errorStyle: TextStyle(
+                      color: Colors.red[400],
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ),

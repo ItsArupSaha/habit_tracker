@@ -187,7 +187,13 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark 
+          ? const Color(0xFF0A0E21) 
+          : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -197,6 +203,52 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
             child: IntrinsicHeight(
               child: Column(
                 children: [
+                  // Theme toggle positioned absolutely
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 16, right: 16),
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? const Color(0xFF1E2337) 
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark 
+                                ? Colors.black.withOpacity(0.3)
+                                : Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDark 
+                              ? const Color(0xFF2A3149)
+                              : Colors.grey.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: IconButton(
+                        icon: Consumer<ThemeService>(
+                          builder: (context, themeService, child) {
+                            return Icon(
+                              themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                              color: isDark 
+                                  ? const Color(0xFFFFD700)
+                                  : const Color(0xFF6B7280),
+                              size: 24,
+                            );
+                          },
+                        ),
+                        onPressed: () {
+                          Provider.of<ThemeService>(context, listen: false).toggleTheme();
+                        },
+                      ),
+                    ),
+                  ),
+                  
                   // Simple header with icon and text
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
@@ -204,31 +256,64 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                       children: [
                         const SizedBox(height: 40),
                         
-                        // Habit tracker icon
-                        const Icon(
-                          Icons.person_add,
-                          size: 40,
-                          color: Color(0xFFFF6B35),
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        
-                        const Text(
-                          'Create Account',
-                          style: TextStyle(
+                        // Habit tracker icon with glow effect
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark 
+                                ? const Color(0xFF1E2337) 
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF6B35).withOpacity(isDark ? 0.3 : 0.2),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.person_add,
+                            size: 40,
                             color: Color(0xFFFF6B35),
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
                           ),
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 24),
+                        
+                        Text(
+                          'Create Account',
+                          style: TextStyle(
+                            color: isDark 
+                                ? const Color(0xFFFF6B35)
+                                : const Color(0xFFFF6B35),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            shadows: isDark ? [
+                              Shadow(
+                                color: const Color(0xFFFF6B35).withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ] : null,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 12),
                         
                         Text(
                           'Join us to start your habit journey',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: isDark 
+                                ? const Color(0xFF9CA3AF)
+                                : const Color(0xFF6B7280),
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
@@ -237,31 +322,6 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                         
                         const SizedBox(height: 40),
                       ],
-                    ),
-                  ),
-                  
-                  // Theme toggle positioned absolutely
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: Consumer<ThemeService>(
-                          builder: (context, themeService, child) {
-                            return Icon(
-                              themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                              color: Colors.grey[700],
-                            );
-                          },
-                        ),
-                        onPressed: () {
-                          Provider.of<ThemeService>(context, listen: false).toggleTheme();
-                        },
-                      ),
                     ),
                   ),
                   
@@ -275,15 +335,25 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                           margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
+                            color: isDark 
+                                ? const Color(0xFF1E2337) 
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                                color: isDark 
+                                    ? Colors.black.withOpacity(0.4)
+                                    : Colors.black.withOpacity(0.08),
+                                blurRadius: 30,
+                                offset: const Offset(0, 15),
                               ),
                             ],
+                            border: Border.all(
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
                           ),
                           child: Form(
                             key: _formKey,
@@ -295,7 +365,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   controller: _displayNameController,
                                   labelText: 'Display Name',
                                   hintText: 'Enter your display name',
-                                  prefixIcon: const Icon(Icons.person_outline),
+                                  prefixIcon: Icon(
+                                    Icons.person_outline,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Display name is required';
@@ -307,7 +382,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   },
                                 ),
                                 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 
                                 // Email field
                                 CustomTextField(
@@ -315,7 +390,12 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   labelText: 'Email',
                                   hintText: 'Enter your email',
                                   keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: const Icon(Icons.email_outlined),
+                                  prefixIcon: Icon(
+                                    Icons.email_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Email is required';
@@ -328,21 +408,28 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   },
                                 ),
                                 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 
-                                // Password fields
+                                // Password field
                                 CustomTextField(
                                   controller: _passwordController,
                                   labelText: 'Password',
-                                  hintText: 'Enter password',
+                                  hintText: 'Enter your password',
                                   obscureText: _obscurePassword,
-                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  prefixIcon: Icon(
+                                    Icons.lock_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
                                           ? Icons.visibility
                                           : Icons.visibility_off,
-                                      color: Colors.grey[600],
+                                      color: isDark 
+                                          ? const Color(0xFF9CA3AF)
+                                          : const Color(0xFF6B7280),
                                     ),
                                     onPressed: () {
                                       setState(() => _obscurePassword = !_obscurePassword);
@@ -359,20 +446,28 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   },
                                 ),
                                 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 
+                                // Confirm password field
                                 CustomTextField(
                                   controller: _confirmPasswordController,
                                   labelText: 'Confirm Password',
-                                  hintText: 'Confirm password',
+                                  hintText: 'Confirm your password',
                                   obscureText: _obscureConfirmPassword,
-                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  prefixIcon: Icon(
+                                    Icons.lock_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscureConfirmPassword
                                           ? Icons.visibility
                                           : Icons.visibility_off,
-                                      color: Colors.grey[600],
+                                      color: isDark 
+                                          ? const Color(0xFF9CA3AF)
+                                          : const Color(0xFF6B7280),
                                     ),
                                     onPressed: () {
                                       setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
@@ -389,121 +484,140 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                   },
                                 ),
                                 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 
-                                // Personal info row
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: CustomTextField(
-                                        controller: _ageController,
-                                        labelText: 'Age',
-                                        hintText: 'Age',
-                                        keyboardType: TextInputType.number,
-                                        prefixIcon: const Icon(Icons.calendar_today),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Age is required';
-                                          }
-                                          final age = int.tryParse(value);
-                                          if (age == null || age < 13 || age > 120) {
-                                            return 'Please enter a valid age';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    
-                                    const SizedBox(width: 12),
-                                    
-                                    Expanded(
-                                      child: DropdownButtonFormField<String>(
-                                        value: _selectedGender,
-                                        decoration: InputDecoration(
-                                          labelText: 'Gender',
-                                          border: OutlineInputBorder(
-                                            borderRadius: BorderRadius.circular(12),
-                                          ),
-                                          filled: true,
-                                          fillColor: Colors.grey[50],
-                                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                          isDense: true,
-                                        ),
-                                        items: _genderOptions.map((gender) {
-                                          return DropdownMenuItem<String>(
-                                            value: gender,
-                                            child: Text(gender),
-                                          );
-                                        }).toList(),
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            _selectedGender = newValue;
-                                          });
-                                        },
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Gender is required';
-                                          }
-                                          return null;
-                                        },
-                                        isExpanded: true,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                
-                                const SizedBox(height: 16),
-                                
-                                // Physical info row
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: CustomTextField(
-                                        controller: _weightController,
-                                        labelText: 'Weight (kg)',
-                                        hintText: 'Weight',
-                                        keyboardType: TextInputType.number,
-                                        prefixIcon: const Icon(Icons.monitor_weight),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Weight is required';
-                                          }
-                                          final weight = double.tryParse(value);
-                                          if (weight == null || weight < 20 || weight > 300) {
-                                            return 'Please enter a valid weight';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    
-                                    const SizedBox(width: 12),
-                                    
-                                    Expanded(
-                                      child: CustomTextField(
-                                        controller: _heightController,
-                                        labelText: 'Height (cm)',
-                                        hintText: 'Height',
-                                        keyboardType: TextInputType.number,
-                                        prefixIcon: const Icon(Icons.height),
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Height is required';
-                                          }
-                                          final height = double.tryParse(value);
-                                          if (height == null || height < 100 || height > 250) {
-                                            return 'Please enter a valid height';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  ],
+                                // Age field
+                                CustomTextField(
+                                  controller: _ageController,
+                                  labelText: 'Age',
+                                  hintText: 'Enter your age',
+                                  keyboardType: TextInputType.number,
+                                  prefixIcon: Icon(
+                                    Icons.cake_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Age is required';
+                                    }
+                                    final age = int.tryParse(value);
+                                    if (age == null || age < 13 || age > 120) {
+                                      return 'Please enter a valid age (13-120)';
+                                    }
+                                    return null;
+                                  },
                                 ),
                                 
                                 const SizedBox(height: 20),
                                 
-                                // Terms and conditions
+                                // Gender selection
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                  decoration: BoxDecoration(
+                                    color: isDark 
+                                        ? const Color(0xFF2A3149)
+                                        : Colors.grey[50],
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(
+                                      color: isDark 
+                                          ? const Color(0xFF3A4159)
+                                          : Colors.grey[300]!,
+                                      width: 1.5,
+                                    ),
+                                  ),
+                                  child: DropdownButtonFormField<String>(
+                                    value: _selectedGender,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Gender',
+                                      border: InputBorder.none,
+                                      prefixIcon: Icon(Icons.person_outline),
+                                    ),
+                                    items: _genderOptions.map((String gender) {
+                                      return DropdownMenuItem<String>(
+                                        value: gender,
+                                        child: Text(gender),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        _selectedGender = newValue;
+                                      });
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Please select your gender';
+                                      }
+                                      return null;
+                                    },
+                                    dropdownColor: isDark 
+                                        ? const Color(0xFF2A3149)
+                                        : Colors.white,
+                                    style: TextStyle(
+                                      color: isDark 
+                                          ? const Color(0xFFE5E7EB)
+                                          : const Color(0xFF2C3E50),
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                                
+                                const SizedBox(height: 20),
+                                
+                                // Weight field
+                                CustomTextField(
+                                  controller: _weightController,
+                                  labelText: 'Weight (kg)',
+                                  hintText: 'Enter your weight in kg',
+                                  keyboardType: TextInputType.number,
+                                  prefixIcon: Icon(
+                                    Icons.monitor_weight_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Weight is required';
+                                    }
+                                    final weight = double.tryParse(value);
+                                    if (weight == null || weight < 20 || weight > 300) {
+                                      return 'Please enter a valid weight (20-300 kg)';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                
+                                const SizedBox(height: 20),
+                                
+                                // Height field
+                                CustomTextField(
+                                  controller: _heightController,
+                                  labelText: 'Height (cm)',
+                                  hintText: 'Enter your height in cm',
+                                  keyboardType: TextInputType.number,
+                                  prefixIcon: Icon(
+                                    Icons.height_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'Height is required';
+                                    }
+                                    final height = double.tryParse(value);
+                                    if (height == null || height < 100 || height > 250) {
+                                      return 'Please enter a valid height (100-250 cm)';
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                
+                                const SizedBox(height: 24),
+                                
+                                // Terms and conditions checkbox
                                 Row(
                                   children: [
                                     Checkbox(
@@ -514,27 +628,23 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                         });
                                       },
                                       activeColor: const Color(0xFFFF6B35),
+                                      checkColor: Colors.white,
                                     ),
                                     Expanded(
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _acceptedTerms = !_acceptedTerms;
-                                          });
-                                        },
-                                        child: Text(
-                                          'I accept the terms and conditions',
-                                          style: TextStyle(
-                                            color: Colors.grey[700],
-                                            fontSize: 14,
-                                          ),
+                                      child: Text(
+                                        'I accept the terms and conditions',
+                                        style: TextStyle(
+                                          color: isDark 
+                                              ? const Color(0xFF9CA3AF)
+                                              : const Color(0xFF6B7280),
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                                 
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 28),
                                 
                                 // Register button
                                 CustomButton(
@@ -551,7 +661,7 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                       : const Text('Create Account'),
                                 ),
                                 
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 24),
                                 
                                 // Login link
                                 Row(
@@ -560,13 +670,19 @@ class _RegisterScreenState extends State<RegisterScreen> with TickerProviderStat
                                     Text(
                                       'Already have an account? ',
                                       style: TextStyle(
-                                        color: Colors.grey[600],
+                                        color: isDark 
+                                            ? const Color(0xFF9CA3AF)
+                                            : const Color(0xFF6B7280),
                                         fontSize: 14,
                                       ),
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (_) => const LoginScreen(),
+                                          ),
+                                        );
                                       },
                                       style: TextButton.styleFrom(
                                         foregroundColor: const Color(0xFFFF6B35),

@@ -141,7 +141,13 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Scaffold(
+      backgroundColor: isDark 
+          ? const Color(0xFF0A0E21) 
+          : const Color(0xFFF8F9FA),
       body: SafeArea(
         child: SingleChildScrollView(
           child: ConstrainedBox(
@@ -151,6 +157,52 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
             child: IntrinsicHeight(
               child: Column(
                 children: [
+                  // Theme toggle positioned absolutely
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: Container(
+                      margin: const EdgeInsets.only(top: 16, right: 16),
+                      decoration: BoxDecoration(
+                        color: isDark 
+                            ? const Color(0xFF1E2337) 
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: isDark 
+                                ? Colors.black.withOpacity(0.3)
+                                : Colors.black.withOpacity(0.1),
+                            blurRadius: 20,
+                            offset: const Offset(0, 8),
+                          ),
+                        ],
+                        border: Border.all(
+                          color: isDark 
+                              ? const Color(0xFF2A3149)
+                              : Colors.grey.withOpacity(0.2),
+                          width: 1,
+                        ),
+                      ),
+                      child: IconButton(
+                        icon: Consumer<ThemeService>(
+                          builder: (context, themeService, child) {
+                            return Icon(
+                              themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                              color: isDark 
+                                  ? const Color(0xFFFFD700)
+                                  : const Color(0xFF6B7280),
+                              size: 24,
+                            );
+                          },
+                        ),
+                        onPressed: () {
+                          Provider.of<ThemeService>(context, listen: false).toggleTheme();
+                        },
+                      ),
+                    ),
+                  ),
+                  
                   // Simple header with icon and text
                   Padding(
                     padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
@@ -158,31 +210,64 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                       children: [
                         const SizedBox(height: 40),
                         
-                        // Habit tracker icon
-                        const Icon(
-                          Icons.track_changes,
-                          size: 40,
-                          color: Color(0xFFFF6B35),
-                        ),
-                        
-                        const SizedBox(height: 16),
-                        
-                        const Text(
-                          'Welcome Back!',
-                          style: TextStyle(
+                        // Habit tracker icon with glow effect
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: isDark 
+                                ? const Color(0xFF1E2337) 
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0xFFFF6B35).withOpacity(isDark ? 0.3 : 0.2),
+                                blurRadius: 30,
+                                offset: const Offset(0, 10),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.track_changes,
+                            size: 40,
                             color: Color(0xFFFF6B35),
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 0.5,
                           ),
                         ),
                         
-                        const SizedBox(height: 8),
+                        const SizedBox(height: 24),
+                        
+                        Text(
+                          'Welcome Back!',
+                          style: TextStyle(
+                            color: isDark 
+                                ? const Color(0xFFFF6B35)
+                                : const Color(0xFFFF6B35),
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                            shadows: isDark ? [
+                              Shadow(
+                                color: const Color(0xFFFF6B35).withOpacity(0.3),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ] : null,
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 12),
                         
                         Text(
                           'Sign in to continue tracking your habits',
                           style: TextStyle(
-                            color: Colors.grey[600],
+                            color: isDark 
+                                ? const Color(0xFF9CA3AF)
+                                : const Color(0xFF6B7280),
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
@@ -191,31 +276,6 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                         
                         const SizedBox(height: 40),
                       ],
-                    ),
-                  ),
-                  
-                  // Theme toggle positioned absolutely
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: IconButton(
-                        icon: Consumer<ThemeService>(
-                          builder: (context, themeService, child) {
-                            return Icon(
-                              themeService.isDarkMode ? Icons.light_mode : Icons.dark_mode,
-                              color: Colors.grey[700],
-                            );
-                          },
-                        ),
-                        onPressed: () {
-                          Provider.of<ThemeService>(context, listen: false).toggleTheme();
-                        },
-                      ),
                     ),
                   ),
                   
@@ -229,15 +289,25 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                           margin: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.06),
                           decoration: BoxDecoration(
-                            color: Colors.grey[200],
-                            borderRadius: BorderRadius.circular(20),
+                            color: isDark 
+                                ? const Color(0xFF1E2337) 
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(24),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.08),
-                                blurRadius: 20,
-                                offset: const Offset(0, 10),
+                                color: isDark 
+                                    ? Colors.black.withOpacity(0.4)
+                                    : Colors.black.withOpacity(0.08),
+                                blurRadius: 30,
+                                offset: const Offset(0, 15),
                               ),
                             ],
+                            border: Border.all(
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey.withOpacity(0.2),
+                              width: 1,
+                            ),
                           ),
                           child: Form(
                             key: _formKey,
@@ -250,7 +320,12 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   labelText: 'Email',
                                   hintText: 'Enter your email',
                                   keyboardType: TextInputType.emailAddress,
-                                  prefixIcon: const Icon(Icons.email_outlined),
+                                  prefixIcon: Icon(
+                                    Icons.email_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'Email is required';
@@ -263,7 +338,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   },
                                 ),
                                 
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 20),
                                 
                                 // Password field
                                 CustomTextField(
@@ -271,13 +346,20 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   labelText: 'Password',
                                   hintText: 'Enter your password',
                                   obscureText: _obscurePassword,
-                                  prefixIcon: const Icon(Icons.lock_outlined),
+                                  prefixIcon: Icon(
+                                    Icons.lock_outlined,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : const Color(0xFF6B7280),
+                                  ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _obscurePassword
                                           ? Icons.visibility
                                           : Icons.visibility_off,
-                                      color: Colors.grey[600],
+                                      color: isDark 
+                                          ? const Color(0xFF9CA3AF)
+                                          : const Color(0xFF6B7280),
                                     ),
                                     onPressed: () {
                                       setState(() => _obscurePassword = !_obscurePassword);
@@ -294,7 +376,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                   },
                                 ),
                                 
-                                const SizedBox(height: 24),
+                                const SizedBox(height: 28),
                                 
                                 // Login button
                                 CustomButton(
@@ -311,7 +393,7 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                       : const Text('Sign In'),
                                 ),
                                 
-                                const SizedBox(height: 20),
+                                const SizedBox(height: 24),
                                 
                                 // Register link
                                 Row(
@@ -320,7 +402,9 @@ class _LoginScreenState extends State<LoginScreen> with TickerProviderStateMixin
                                     Text(
                                       "Don't have an account? ",
                                       style: TextStyle(
-                                        color: Colors.grey[600],
+                                        color: isDark 
+                                            ? const Color(0xFF9CA3AF)
+                                            : const Color(0xFF6B7280),
                                         fontSize: 14,
                                       ),
                                     ),
