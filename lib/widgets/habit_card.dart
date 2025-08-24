@@ -71,14 +71,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                 color: isDark 
                     ? const Color(0xFF1E2337) 
                     : Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: isDark 
                         ? Colors.black.withOpacity(0.3)
                         : Colors.black.withOpacity(0.08),
-                    blurRadius: 25,
-                    offset: const Offset(0, 15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
                   ),
                 ],
                 border: Border.all(
@@ -92,32 +92,26 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    // Card tap animation
                     _animationController.forward(from: 0.0);
                   },
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(16),
                   child: Padding(
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Header row with category and actions
+                        // Top row: Category badge and actions
                         Row(
                           children: [
-                            // Category badge with modern design
+                            // Category badge
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                               decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    widget.habit.categoryColor.withOpacity(0.2),
-                                    widget.habit.categoryColor.withOpacity(0.1),
-                                  ],
-                                ),
+                                color: widget.habit.categoryColor.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: widget.habit.categoryColor.withOpacity(0.3),
-                                  width: 1.5,
+                                  width: 1,
                                 ),
                               ),
                               child: Row(
@@ -125,14 +119,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                 children: [
                                   Icon(
                                     widget.habit.categoryIcon,
-                                    size: 18,
+                                    size: 16,
                                     color: widget.habit.categoryColor,
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 6),
                                   Text(
                                     widget.habit.category,
                                     style: TextStyle(
-                                      fontSize: 13,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.w600,
                                       color: widget.habit.categoryColor,
                                     ),
@@ -143,37 +137,13 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                             
                             const Spacer(),
                             
-                            // Frequency badge
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFFF6B35).withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(15),
-                                border: Border.all(
-                                  color: const Color(0xFFFF6B35).withOpacity(0.3),
-                                  width: 1,
-                                ),
-                              ),
-                              child: Text(
-                                widget.habit.frequency.toUpperCase(),
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFFFF6B35),
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 12),
-                            
-                            // More options menu with modern design
+                            // More options menu
                             Container(
                               decoration: BoxDecoration(
                                 color: isDark 
                                     ? const Color(0xFF2A3149)
                                     : Colors.grey[100],
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(8),
                               ),
                               child: PopupMenuButton<String>(
                                 icon: Icon(
@@ -181,10 +151,10 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                   color: isDark 
                                       ? const Color(0xFF9CA3AF)
                                       : Colors.grey[700],
-                                  size: 20,
+                                  size: 18,
                                 ),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 elevation: 8,
                                 onSelected: (value) {
@@ -204,14 +174,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                       children: [
                                         Icon(
                                           Icons.edit_outlined,
-                                          size: 18,
+                                          size: 16,
                                           color: const Color(0xFFFF6B35),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Edit',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                             color: isDark 
                                                 ? const Color(0xFFE5E7EB)
@@ -227,14 +197,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                       children: [
                                         Icon(
                                           Icons.delete_outline,
-                                          size: 18,
+                                          size: 16,
                                           color: Colors.red[400],
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: 8),
                                         Text(
                                           'Delete',
                                           style: TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.w500,
                                             color: Colors.red[400],
                                           ),
@@ -248,31 +218,81 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                           ],
                         ),
                         
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 16),
                         
-                        // Habit title with modern typography
+                        // Habit title
                         Text(
                           widget.habit.title,
                           style: TextStyle(
-                            fontSize: 20,
+                            fontSize: 18,
                             fontWeight: FontWeight.bold,
                             color: isDark 
                                 ? const Color(0xFFE5E7EB)
                                 : const Color(0xFF2C3E50),
-                            height: 1.3,
+                            height: 1.2,
                           ),
                         ),
                         
-                        // Notes (if any) with modern styling
+                        const SizedBox(height: 8),
+                        
+                        // Frequency and streak info
+                        Row(
+                          children: [
+                            // Frequency badge
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFFF6B35).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Text(
+                                widget.habit.frequency.toUpperCase(),
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFFFF6B35),
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            
+                            const SizedBox(width: 12),
+                            
+                            // Streak info
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.local_fire_department,
+                                  size: 16,
+                                  color: const Color(0xFFFF6B35),
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${widget.habit.currentStreak} day streak',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        
+                        // Notes section
                         if (widget.habit.notes != null && widget.habit.notes!.isNotEmpty) ...[
                           const SizedBox(height: 12),
                           Container(
-                            padding: const EdgeInsets.all(16),
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
                               color: isDark 
                                   ? const Color(0xFF2A3149)
                                   : Colors.grey[50],
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(10),
                               border: Border.all(
                                 color: isDark 
                                     ? const Color(0xFF3A4159)
@@ -283,136 +303,80 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                             child: Text(
                               widget.habit.notes!,
                               style: TextStyle(
-                                fontSize: 14,
+                                fontSize: 13,
                                 color: isDark 
                                     ? const Color(0xFF9CA3AF)
                                     : Colors.grey[700],
                                 height: 1.4,
                               ),
-                              maxLines: 3,
+                              maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                         ],
                         
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 16),
                         
-                        // Bottom row with completion toggle and streak
-                        Row(
-                          children: [
-                            // Completion toggle with modern design
-                            Expanded(
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: widget.habit.isCompletedToday 
-                                      ? const Color(0xFFFF6B35).withOpacity(0.1)
-                                      : (isDark 
-                                          ? const Color(0xFF2A3149)
-                                          : Colors.grey[100]),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(
-                                    color: widget.habit.isCompletedToday 
-                                        ? const Color(0xFFFF6B35).withOpacity(0.3)
-                                        : (isDark 
-                                            ? const Color(0xFF3A4159)
-                                            : Colors.grey[300]!),
-                                    width: 1.5,
-                                  ),
-                                ),
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    onTap: () {
-                                      widget.onToggleCompletion(!widget.habit.isCompletedToday);
-                                    },
-                                    borderRadius: BorderRadius.circular(16),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            widget.habit.isCompletedToday 
-                                                ? Icons.check_circle
-                                                : Icons.radio_button_unchecked,
-                                            color: widget.habit.isCompletedToday 
-                                                ? const Color(0xFFFF6B35)
-                                                : (isDark 
-                                                    ? const Color(0xFF9CA3AF)
-                                                    : Colors.grey[600]),
-                                            size: 20,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            widget.habit.isCompletedToday ? 'Completed!' : 'Mark Complete',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color: widget.habit.isCompletedToday 
-                                                  ? const Color(0xFFFF6B35)
-                                                  : (isDark 
-                                                      ? const Color(0xFF9CA3AF)
-                                                      : Colors.grey[700]),
-                                            ),
-                                          ),
-                                        ],
+                        // Completion toggle button
+                        Container(
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: widget.habit.isCompletedToday 
+                                ? const Color(0xFFFF6B35).withOpacity(0.15)
+                                : (isDark 
+                                    ? const Color(0xFF2A3149)
+                                    : Colors.grey[100]),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: widget.habit.isCompletedToday 
+                                  ? const Color(0xFFFF6B35).withOpacity(0.4)
+                                  : (isDark 
+                                      ? const Color(0xFF3A4159)
+                                      : Colors.grey[300]!),
+                              width: 1.5,
+                            ),
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                widget.onToggleCompletion(!widget.habit.isCompletedToday);
+                              },
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      widget.habit.isCompletedToday 
+                                          ? Icons.check_circle
+                                          : Icons.radio_button_unchecked,
+                                      color: widget.habit.isCompletedToday 
+                                          ? const Color(0xFFFF6B35)
+                                          : (isDark 
+                                              ? const Color(0xFF9CA3AF)
+                                              : Colors.grey[600]),
+                                      size: 18,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      widget.habit.isCompletedToday ? 'Completed Today!' : 'Mark as Complete',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w600,
+                                        color: widget.habit.isCompletedToday 
+                                            ? const Color(0xFFFF6B35)
+                                            : (isDark 
+                                                ? const Color(0xFF9CA3AF)
+                                                : Colors.grey[700]),
                                       ),
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            
-                            const SizedBox(width: 16),
-                            
-                            // Streak count with modern design
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    const Color(0xFFFF8A50),
-                                    const Color(0xFFFFA726),
                                   ],
                                 ),
-                                borderRadius: BorderRadius.circular(12),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0xFFFF8A50).withOpacity(0.3),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 6),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Icon(
-                                    Icons.local_fire_department,
-                                    size: 18,
-                                    color: Colors.white,
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    '${widget.habit.currentStreak}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const Text(
-                                    'Streak',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white70,
-                                      letterSpacing: 0.5,
-                                    ),
-                                  ),
-                                ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
