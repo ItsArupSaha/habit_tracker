@@ -5,6 +5,7 @@ import '../../../models/habit.dart';
 import '../../../services/habit_service.dart';
 import '../../../widgets/habit_card.dart';
 import '../../../widgets/add_habit_fab.dart';
+import '../../../widgets/add_habit_dialog.dart';
 
 class HabitsTab extends StatefulWidget {
   const HabitsTab({super.key});
@@ -337,8 +338,21 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
   }
   
   void _editHabit(Habit habit) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Edit feature coming soon!')),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AddHabitDialog(
+        isEditing: true,
+        habitToEdit: habit,
+        onHabitUpdated: (updatedHabit) {
+          setState(() {
+            final index = _habits.indexWhere((h) => h.id == updatedHabit.id);
+            if (index != -1) {
+              _habits[index] = updatedHabit;
+            }
+          });
+        },
+      ),
     );
   }
   
