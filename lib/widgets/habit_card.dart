@@ -56,6 +56,9 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
@@ -65,15 +68,25 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
             opacity: _opacityAnimation.value,
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark 
+                    ? const Color(0xFF1E2337) 
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.08),
+                    color: isDark 
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.black.withOpacity(0.08),
                     blurRadius: 25,
                     offset: const Offset(0, 15),
                   ),
                 ],
+                border: Border.all(
+                  color: isDark 
+                      ? const Color(0xFF2A3149)
+                      : Colors.grey.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
               child: Material(
                 color: Colors.transparent,
@@ -157,13 +170,17 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                             // More options menu with modern design
                             Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey[100],
+                                color: isDark 
+                                    ? const Color(0xFF2A3149)
+                                    : Colors.grey[100],
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: PopupMenuButton<String>(
                                 icon: Icon(
                                   Icons.more_vert,
-                                  color: Colors.grey[700],
+                                  color: isDark 
+                                      ? const Color(0xFF9CA3AF)
+                                      : Colors.grey[700],
                                   size: 20,
                                 ),
                                 shape: RoundedRectangleBorder(
@@ -191,11 +208,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                           color: const Color(0xFFFF6B35),
                                         ),
                                         const SizedBox(width: 12),
-                                        const Text(
+                                        Text(
                                           'Edit',
                                           style: TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w500,
+                                            color: isDark 
+                                                ? const Color(0xFFE5E7EB)
+                                                : const Color(0xFF2C3E50),
                                           ),
                                         ),
                                       ],
@@ -233,10 +253,12 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                         // Habit title with modern typography
                         Text(
                           widget.habit.title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFF2C3E50),
+                            color: isDark 
+                                ? const Color(0xFFE5E7EB)
+                                : const Color(0xFF2C3E50),
                             height: 1.3,
                           ),
                         ),
@@ -247,10 +269,14 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                           Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              color: Colors.grey[50],
+                              color: isDark 
+                                  ? const Color(0xFF2A3149)
+                                  : Colors.grey[50],
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: Colors.grey[200]!,
+                                color: isDark 
+                                    ? const Color(0xFF3A4159)
+                                    : Colors.grey[200]!,
                                 width: 1,
                               ),
                             ),
@@ -258,7 +284,9 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                               widget.habit.notes!,
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.grey[700],
+                                color: isDark 
+                                    ? const Color(0xFF9CA3AF)
+                                    : Colors.grey[700],
                                 height: 1.4,
                               ),
                               maxLines: 3,
@@ -278,12 +306,16 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                 decoration: BoxDecoration(
                                   color: widget.habit.isCompletedToday 
                                       ? const Color(0xFFFF6B35).withOpacity(0.1)
-                                      : Colors.grey[100],
+                                      : (isDark 
+                                          ? const Color(0xFF2A3149)
+                                          : Colors.grey[100]),
                                   borderRadius: BorderRadius.circular(16),
                                   border: Border.all(
                                     color: widget.habit.isCompletedToday 
                                         ? const Color(0xFFFF6B35).withOpacity(0.3)
-                                        : Colors.grey[300]!,
+                                        : (isDark 
+                                            ? const Color(0xFF3A4159)
+                                            : Colors.grey[300]!),
                                     width: 1.5,
                                   ),
                                 ),
@@ -305,7 +337,9 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                                 : Icons.radio_button_unchecked,
                                             color: widget.habit.isCompletedToday 
                                                 ? const Color(0xFFFF6B35)
-                                                : Colors.grey[600],
+                                                : (isDark 
+                                                    ? const Color(0xFF9CA3AF)
+                                                    : Colors.grey[600]),
                                             size: 20,
                                           ),
                                           const SizedBox(width: 8),
@@ -316,7 +350,9 @@ class _HabitCardState extends State<HabitCard> with SingleTickerProviderStateMix
                                               fontWeight: FontWeight.w600,
                                               color: widget.habit.isCompletedToday 
                                                   ? const Color(0xFFFF6B35)
-                                                  : Colors.grey[700],
+                                                  : (isDark 
+                                                      ? const Color(0xFF9CA3AF)
+                                                      : Colors.grey[700]),
                                             ),
                                           ),
                                         ],

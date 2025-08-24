@@ -88,89 +88,52 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
   
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: isDark 
+          ? const Color(0xFF0A0E21) 
+          : const Color(0xFFF8F9FA),
       body: CustomScrollView(
         slivers: [
-          // Modern header with gradient
-          SliverAppBar(
-            expandedHeight: 120,
-            floating: false,
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            elevation: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      const Color(0xFFFF6B35),
-                      const Color(0xFFFF8A50),
-                      const Color(0xFFFFA726),
-                    ],
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                  ),
-                  child: const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 40),
-                        Text(
-                          'My Habits',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                        Text(
-                          'Track your progress, build your future',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          
           // Category filter with modern design
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.all(16),
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark 
+                    ? const Color(0xFF1E2337) 
+                    : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: isDark 
+                        ? Colors.black.withOpacity(0.3)
+                        : Colors.black.withOpacity(0.05),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
                 ],
+                border: Border.all(
+                  color: isDark 
+                      ? const Color(0xFF2A3149)
+                      : Colors.grey.withOpacity(0.2),
+                  width: 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Categories',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF2C3E50),
+                      color: isDark 
+                          ? const Color(0xFFE5E7EB)
+                          : const Color(0xFF2C3E50),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -201,10 +164,14 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
                                       const Color(0xFFFF8A50),
                                     ],
                                   ) : null,
-                                  color: isSelected ? null : Colors.grey[100],
+                                  color: isSelected ? null : (isDark 
+                                      ? const Color(0xFF2A3149)
+                                      : Colors.grey[100]),
                                   borderRadius: BorderRadius.circular(25),
                                   border: isSelected ? null : Border.all(
-                                    color: Colors.grey[300]!,
+                                    color: isDark 
+                                        ? const Color(0xFF3A4159)
+                                        : Colors.grey[300]!,
                                     width: 1,
                                   ),
                                 ),
@@ -213,7 +180,9 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
-                                    color: isSelected ? Colors.white : Colors.grey[700],
+                                    color: isSelected ? Colors.white : (isDark 
+                                        ? const Color(0xFF9CA3AF)
+                                        : Colors.grey[700]),
                                   ),
                                 ),
                               ),
@@ -288,6 +257,9 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
   }
   
   Widget _buildEmptyState() {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
     return Container(
       padding: const EdgeInsets.all(32),
       child: Column(
@@ -297,7 +269,7 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: const Color(0xFFFF6B35).withOpacity(0.1),
+              color: const Color(0xFFFF6B35).withOpacity(isDark ? 0.2 : 0.1),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -310,7 +282,9 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
           Text(
             'No habits yet',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              color: const Color(0xFF2C3E50),
+              color: isDark 
+                  ? const Color(0xFFE5E7EB)
+                  : const Color(0xFF2C3E50),
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -318,7 +292,9 @@ class _HabitsTabState extends State<HabitsTab> with TickerProviderStateMixin {
           Text(
             'Tap the + button to create your first habit',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Colors.grey[600],
+              color: isDark 
+                  ? const Color(0xFF9CA3AF)
+                  : Colors.grey[600],
               fontSize: 16,
             ),
             textAlign: TextAlign.center,
