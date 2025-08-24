@@ -109,14 +109,6 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                       ? const Color(0xFF2A3149)
                       : Colors.white,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: _isFocused 
-                        ? const Color(0xFFFF6B35)
-                        : isDark 
-                            ? const Color(0xFF3A4159)
-                            : Colors.grey[300]!,
-                    width: _isFocused ? 2.0 : 1.5,
-                  ),
                   boxShadow: _isFocused ? [
                     BoxShadow(
                       color: const Color(0xFFFF6B35).withOpacity(isDark ? 0.4 : 0.2),
@@ -160,7 +152,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                     prefixIcon: widget.prefixIcon,
                     suffixIcon: widget.suffixIcon,
                     border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
                         color: _isFocused 
                             ? const Color(0xFFFF6B35)
@@ -171,7 +163,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                       ),
                     ),
                     enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide(
                         color: _isFocused 
                             ? const Color(0xFFFF6B35)
@@ -182,21 +174,21 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
                         color: Color(0xFFFF6B35),
                         width: 2,
                       ),
                     ),
                     errorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
                         color: Colors.red,
                         width: 2,
                       ),
                     ),
                     focusedErrorBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                       borderSide: const BorderSide(
                         color: Colors.red,
                         width: 2,
@@ -226,6 +218,7 @@ class _CustomTextFieldState extends State<CustomTextField> with SingleTickerProv
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
+                    floatingLabelBehavior: FloatingLabelBehavior.auto,
                   ),
                 ),
               ),
